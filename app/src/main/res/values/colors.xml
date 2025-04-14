@@ -2,4 +2,15 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="sunrise">#ffa700</color>
+    <color name="sunday">#FAEFC8</color>
+    <color name="sunset">#FAD6A5</color>
+    <color name="moon">#e5e5e5</color>
+    <color name="moonBright">#F6F1D5</color>
+    <color name="skysunrise">#c0eeff</color>
+    <color name="skyday">#91fcff</color>
+    <color name="skysunset">#b0d5f5</color>
+    <color name="skynight">#131862</color>
+    <color name="groundday">#8c3b0c</color>
+    <color name="groundnight">#000B0D</color>
 </resources>
