@@ -13,6 +13,9 @@ import kotlinx.coroutines.cancel
 class MainScreenViewModel: ViewModel() {
     var isAnimationPlaying = false
     var state = DayAnimation.Companion.AnimationState.DAY
+    var isInitialized = false
+    var isCancelled = false
+    var isUpdated = false
 
     var sunAnimator: DayAnimation? = null
     var moonAnimator: DayAnimation? = null
@@ -23,10 +26,27 @@ class MainScreenViewModel: ViewModel() {
 
     lateinit var scope: CoroutineScope
 
+    fun initAnimators(sunAnimator: DayAnimation, moonAnimator: DayAnimation, sunColorAnimator: DayAnimation, moonColorAnimator: DayAnimation, skyColorAnimator: DayAnimation, groundColorAnimator: DayAnimation){
+        this.sunAnimator = sunAnimator
+        this.moonAnimator = moonAnimator
+        this.sunColorAnimator = sunColorAnimator
+        this.moonColorAnimator = moonColorAnimator
+        this.skyColorAnimator = skyColorAnimator
+        this.groundColorAnimator = groundColorAnimator
+        isInitialized = true
+    }
+
     fun startAnimators() {
         scope = CoroutineScope(Dispatchers.Default)
-        Log.d("ViewModel", "MainScreenViewModel started animations")
+        Log.d("ViewModel", "MainScreenViewModel started animations from state")
         isAnimationPlaying = true
+        isCancelled = false
+        sunAnimator?.state = state
+        moonAnimator?.state = state
+        sunColorAnimator?.state = state
+        moonColorAnimator?.state = state
+        skyColorAnimator?.state = state
+        groundColorAnimator?.state = state
         sunAnimator?.startAnimator()
         moonAnimator?.startAnimator()
         sunColorAnimator?.startAnimator()
@@ -37,8 +57,9 @@ class MainScreenViewModel: ViewModel() {
         scope.launch {
             delay(MainActivity.Companion.ANIM_DURATION)
             isAnimationPlaying = false
+            isCancelled = false
             state = DayAnimation.Companion.nextState(state)
-            Log.d("ViewModel", "MainScreenViewModel changed state to ")
+            Log.d("ViewModel", "MainScreenViewModel changed state to ${state}")
         }
     }
     fun stopAnimators() {
@@ -49,6 +70,9 @@ class MainScreenViewModel: ViewModel() {
         skyColorAnimator?.stopAnimator()
         groundColorAnimator?.stopAnimator()
         scope.cancel()
+        isCancelled = true
+        isUpdated = false
+        isAnimationPlaying = false
     }
 
 
