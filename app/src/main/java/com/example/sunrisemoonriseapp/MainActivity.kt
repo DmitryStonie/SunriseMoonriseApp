@@ -13,9 +13,10 @@ import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.example.sunrisemoonriseapp.animation.DayAnimation
 import com.example.sunrisemoonriseapp.animation.DayAnimation.Companion.AnimationState
-import com.example.sunrisemoonriseapp.animation.DayColorAnimation
-import com.example.sunrisemoonriseapp.animation.DayMovementAnimation
+import com.example.sunrisemoonriseapp.animation.DayAnimation.Companion.AnimationState.*
+import com.example.sunrisemoonriseapp.animation.DayAnimation.Companion.nextState
 
 
 class MainActivity : AppCompatActivity() {
@@ -89,17 +90,16 @@ class MainActivity : AppCompatActivity() {
                 if (!viewModel.isInitialized) {
                     initAnimations()
                     Log.d(LOG_TAG, "MainActivity initialized ViewModel")
-                } else if(!viewModel.isUpdated){
+                } else if (!viewModel.isUpdated) {
                     updateAnimations()
                     Log.d(LOG_TAG, "MainActivity updated ViewModel")
                 }
-                if(viewModel.isCancelled){
-                    viewModel.startAnimators()
+                if (viewModel.isCancelled) {
+                    viewModel.continueAnimators()
                     Log.d(LOG_TAG, "MainActivity started animations")
-                } else{
+                } else {
                     updateElements()
                     Log.d(LOG_TAG, "MainActivity updated elements")
-
                 }
             }
         )
@@ -110,116 +110,223 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         Log.d(LOG_TAG, "MainActivity changed orientation")
+        viewModel.isUpdated = false
         if (viewModel.isAnimationPlaying) {
             viewModel.stopAnimators()
             Log.d(LOG_TAG, "MainActivity stopped animators")
         }
     }
 
-    private fun initAnimations(){
+    private fun initAnimations() {
         viewModel.initAnimators(
-            DayMovementAnimation(
-                viewModel.state,
+            DayAnimation(
                 getSunAnimations()
             ),
-            DayMovementAnimation(
-                viewModel.state,
+            DayAnimation(
                 getMoonAnimations()
             ),
-            DayColorAnimation(
-                viewModel.state,
+            DayAnimation(
                 getSunColorAnimations()
             ),
-            DayColorAnimation(
-                viewModel.state,
+            DayAnimation(
                 getMoonColorAnimations()
             ),
-            DayColorAnimation(
-                viewModel.state,
+            DayAnimation(
                 getSkyColorAnimations()
             ),
-            DayColorAnimation(
-                viewModel.state,
+            DayAnimation(
                 getGroundColorAnimations()
             )
         )
+        viewModel.animationCompletionTime = ANIM_DURATION
     }
 
-    private fun updateAnimations(){
+    private fun updateAnimations() {
+        Log.d("Completion", "Completion ${viewModel.sunAnimator?.animationCompletion}")
         viewModel.sunAnimator?.changeAnimations(
             getSunAnimator(
                 viewModel.state,
-                viewModel.sunAnimator?.animationFraction ?: 0.0F
+                viewModel.sunAnimator?.animationCompletion ?: 0.0F
             ), getSunAnimations()
         )
         viewModel.moonAnimator?.changeAnimations(
             getMoonAnimator(
                 viewModel.state,
-                viewModel.moonAnimator?.animationFraction ?: 0.0F
+                viewModel.moonAnimator?.animationCompletion ?: 0.0F
             ), getMoonAnimations()
         )
         viewModel.sunColorAnimator?.changeAnimations(
-            getSunColorAnimator(viewModel.state), getSunColorAnimations()
+            getSunColorAnimator(
+                viewModel.state,
+                viewModel.sunColorAnimator?.animationCompletion ?: 0.0F
+            ),
+            getSunColorAnimations(),
         )
         viewModel.moonColorAnimator?.changeAnimations(
-            getMoonColorAnimator(viewModel.state), getMoonColorAnimations()
+            getMoonColorAnimator(
+                viewModel.state,
+                viewModel.moonColorAnimator?.animationCompletion ?: 0.0F
+            ), getMoonColorAnimations()
         )
         viewModel.skyColorAnimator?.changeAnimations(
-            getSkyColorAnimator(viewModel.state), getSkyColorAnimations()
+            getSkyColorAnimator(
+                viewModel.state,
+                viewModel.skyColorAnimator?.animationCompletion ?: 0.0F
+            ), getSkyColorAnimations()
         )
         viewModel.groundColorAnimator?.changeAnimations(
-            getGroundColorAnimator(viewModel.state), getGroundColorAnimations()
+            getGroundColorAnimator(
+                viewModel.state,
+                viewModel.groundColorAnimator?.animationCompletion ?: 0.0F
+            ), getGroundColorAnimations()
         )
         viewModel.isUpdated = true
+        viewModel.animationCompletionTime = listOf(
+            (ANIM_DURATION * (1 - (viewModel.sunAnimator?.animationCompletion ?: 0.0F))),
+            (ANIM_DURATION * (1 - (viewModel.moonAnimator?.animationCompletion ?: 0.0F))),
+            (ANIM_DURATION * (1 - (viewModel.sunColorAnimator?.animationCompletion ?: 0.0F))),
+            (ANIM_DURATION * (1 - (viewModel.moonColorAnimator?.animationCompletion ?: 0.0F))),
+            (ANIM_DURATION * (1 - (viewModel.skyColorAnimator?.animationCompletion ?: 0.0F))),
+            (ANIM_DURATION * (1 - (viewModel.groundColorAnimator?.animationCompletion ?: 0.0F)))
+        ).max().toLong()
     }
 
-    private fun updateElements(){
-        when(viewModel.state){
-            AnimationState.DAY -> {
-                sunView.y = getSunPosition(AnimationState.DAY)
-                moonView.y = getMoonPosition(AnimationState.DAY)
+    private fun updateSunColor(state: AnimationState){
+        when(state){
+            DAY -> {
                 (sunView.background as GradientDrawable).setColor(sundayColor)
-                skyView.setBackgroundColor(skyDayColor)
-                groundView.setBackgroundColor(groundColor)
             }
-            AnimationState.SUNSET -> {
-                sunView.y = getSunPosition(AnimationState.SUNSET)
-                moonView.y = getMoonPosition(AnimationState.SUNSET)
+            SUNSET -> {
                 (sunView.background as GradientDrawable).setColor(sunsetColor)
-                skyView.setBackgroundColor(skySunsetColor)
-                groundView.setBackgroundColor(groundColor)
             }
-            AnimationState.NIGHT -> {
-                sunView.y = getSunPosition(AnimationState.NIGHT)
-                moonView.y = getMoonPosition(AnimationState.NIGHT)
+            SUNRISE -> {
+                (sunView.background as GradientDrawable).setColor(sunriseColor)
+            }
+            else -> {}
+        }
+    }
+    private fun updateSunPosition(state: AnimationState){
+        when(state){
+            DAY -> {
+                sunView.y = getSunPosition(DAY)
+
+            }
+            SUNSET -> {
+                sunView.y = getSunPosition(SUNSET)
+
+            }
+            NIGHT -> {
+                sunView.y = getSunPosition(NIGHT)
+
+            }
+            SUNRISE -> {
+                sunView.y = getSunPosition(SUNRISE)
+
+            }
+        }
+    }
+    private fun updateMoonPosition(state: AnimationState){
+        when(state){
+            DAY -> {
+                moonView.y = getMoonPosition(DAY)
+
+            }
+            SUNSET -> {
+                moonView.y = getMoonPosition(SUNSET)
+
+            }
+            NIGHT -> {
+                moonView.y = getMoonPosition(NIGHT)
+
+            }
+            SUNRISE -> {
+                moonView.y = getMoonPosition(SUNRISE)
+
+            }
+        }
+    }
+    private fun updateMoonColor(state: AnimationState){
+        when(state){
+            NIGHT -> {
                 (moonView.background as GradientDrawable).setColor(moonColorBright)
+
+            }
+            else -> {}
+        }
+    }
+    private fun updateSkyColor(state: AnimationState){
+        when(state){
+            DAY -> {
+                skyView.setBackgroundColor(skyDayColor)
+
+            }
+            SUNSET -> {
+                skyView.setBackgroundColor(skySunsetColor)
+
+            }
+            NIGHT -> {
                 skyView.setBackgroundColor(skyNightColor)
+
+            }
+            SUNRISE -> {
+                skyView.setBackgroundColor(skySunriseColor)
+
+            }
+        }
+    }
+    private fun updateGroundColor(state: AnimationState){
+        when(state){
+            DAY -> {
+                groundView.setBackgroundColor(groundColor)
+
+            }
+            SUNSET -> {
+                groundView.setBackgroundColor(groundColor)
+
+            }
+            NIGHT -> {
                 groundView.setBackgroundColor(groundColorNight)
 
             }
-            AnimationState.SUNRISE -> {
-                sunView.y = getSunPosition(AnimationState.SUNRISE)
-                moonView.y = getMoonPosition(AnimationState.SUNRISE)
-                (sunView.background as GradientDrawable).setColor(sunriseColor)
-                skyView.setBackgroundColor(skySunriseColor)
+            SUNRISE -> {
                 groundView.setBackgroundColor(groundColor)
-
 
             }
         }
     }
 
+    private fun updateElements() {
+        if(viewModel.sunColorAnimator?.isCompleted == true){
+            updateSunColor(nextState(viewModel.state))
+        }
+        if(viewModel.sunAnimator?.isCompleted == true){
+            updateSunPosition(nextState(viewModel.state))
+        }
+        if(viewModel.moonColorAnimator?.isCompleted == true){
+            updateMoonColor(nextState(viewModel.state))
+        }
+        if(viewModel.moonAnimator?.isCompleted == true){
+            updateMoonPosition(nextState(viewModel.state))
+        }
+        if(viewModel.skyColorAnimator?.isCompleted == true){
+            updateSkyColor(nextState(viewModel.state))
+        }
+        if(viewModel.groundColorAnimator?.isCompleted == true){
+            updateGroundColor(nextState(viewModel.state))
+        }
+    }
+
     private fun getSunPosition(state: AnimationState): Float {
         return when (state) {
-            AnimationState.DAY -> {
+            DAY -> {
                 skyView.height.toFloat() / 2 - sunView.height.toFloat() / 2
             }
 
-            AnimationState.SUNSET, AnimationState.SUNRISE -> {
+            SUNSET, SUNRISE -> {
                 sceneView.height.toFloat() - groundView.height.toFloat() - sunView.height / 2
             }
 
-            AnimationState.NIGHT -> {
+            NIGHT -> {
                 sceneView.height.toFloat() - groundView.height.toFloat()
             }
         }
@@ -227,11 +334,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun getMoonPosition(state: AnimationState): Float {
         return when (state) {
-            AnimationState.DAY, AnimationState.SUNSET, AnimationState.SUNRISE -> {
+            DAY, SUNSET, SUNRISE -> {
                 sceneView.height.toFloat() - moonView.height.toFloat()
             }
 
-            AnimationState.NIGHT -> {
+            NIGHT -> {
                 skyView.height.toFloat() / 3 - moonView.height.toFloat() / 2
             }
 
@@ -354,46 +461,46 @@ class MainActivity : AppCompatActivity() {
         animationFraction: Float = 0.0F
     ): ValueAnimator? {
         return when (animationsState) {
-            AnimationState.DAY -> {
+            DAY -> {
                 getMovementAnimator(
                     sunView,
-                    getSunPosition(AnimationState.DAY) + animationFraction * (getSunPosition(
-                        AnimationState.SUNSET
-                    ) - getSunPosition(AnimationState.DAY)),
-                    getSunPosition(AnimationState.SUNSET),
+                    getSunPosition(DAY) + animationFraction * (getSunPosition(
+                        SUNSET
+                    ) - getSunPosition(DAY)),
+                    getSunPosition(SUNSET),
                     animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
                 )
             }
 
-            AnimationState.SUNSET -> {
+            SUNSET -> {
                 getMovementAnimator(
                     sunView,
-                    getSunPosition(AnimationState.SUNSET) + animationFraction * (getSunPosition(
-                        AnimationState.NIGHT
-                    ) - getSunPosition(AnimationState.SUNSET)),
-                    getSunPosition(AnimationState.NIGHT),
+                    getSunPosition(SUNSET) + animationFraction * (getSunPosition(
+                        NIGHT
+                    ) - getSunPosition(SUNSET)),
+                    getSunPosition(NIGHT),
                     animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
                 )
             }
 
-            AnimationState.NIGHT -> {
+            NIGHT -> {
                 getMovementAnimator(
                     sunView,
-                    getSunPosition(AnimationState.NIGHT) + animationFraction * (getSunPosition(
-                        AnimationState.SUNRISE
-                    ) - getSunPosition(AnimationState.NIGHT)),
-                    getSunPosition(AnimationState.SUNRISE),
+                    getSunPosition(NIGHT) + animationFraction * (getSunPosition(
+                        SUNRISE
+                    ) - getSunPosition(NIGHT)),
+                    getSunPosition(SUNRISE),
                     animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
                 )
             }
 
-            AnimationState.SUNRISE -> {
+            SUNRISE -> {
                 getMovementAnimator(
                     sunView,
-                    getSunPosition(AnimationState.SUNRISE) + animationFraction * (getSunPosition(
-                        AnimationState.DAY
-                    ) - getSunPosition(AnimationState.SUNRISE)),
-                    getSunPosition(AnimationState.DAY),
+                    getSunPosition(SUNRISE) + animationFraction * (getSunPosition(
+                        DAY
+                    ) - getSunPosition(SUNRISE)),
+                    getSunPosition(DAY),
                     animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
                 )
             }
@@ -405,31 +512,33 @@ class MainActivity : AppCompatActivity() {
         animationFraction: Float = 0.0F
     ): ValueAnimator? {
         return when (animationsState) {
-            AnimationState.DAY -> {
+            DAY -> {
                 null
             }
 
-            AnimationState.SUNSET -> {
+            SUNSET -> {
                 getMovementAnimator(
                     moonView,
-                    getMoonPosition(AnimationState.SUNSET) + animationFraction * (getMoonPosition(
-                        AnimationState.NIGHT
-                    ) - getMoonPosition(AnimationState.SUNSET)),
-                    getMoonPosition(AnimationState.NIGHT)
+                    getMoonPosition(SUNSET) + animationFraction * (getMoonPosition(
+                        NIGHT
+                    ) - getMoonPosition(SUNSET)),
+                    getMoonPosition(NIGHT),
+                    animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
                 )
             }
 
-            AnimationState.NIGHT -> {
+            NIGHT -> {
                 getMovementAnimator(
                     moonView,
-                    getMoonPosition(AnimationState.NIGHT) + animationFraction * (getMoonPosition(
-                        AnimationState.SUNRISE
-                    ) - getMoonPosition(AnimationState.NIGHT)),
-                    getMoonPosition(AnimationState.SUNRISE)
+                    getMoonPosition(NIGHT) + animationFraction * (getMoonPosition(
+                        SUNRISE
+                    ) - getMoonPosition(NIGHT)),
+                    getMoonPosition(SUNRISE),
+                    animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
                 )
             }
 
-            AnimationState.SUNRISE -> {
+            SUNRISE -> {
                 null
             }
         }
@@ -440,31 +549,34 @@ class MainActivity : AppCompatActivity() {
         animationFraction: Float = 0.0F
     ): ValueAnimator? {
         return when (animationsState) {
-            AnimationState.DAY -> {
+            DAY -> {
                 getDrawableColorAnimator(
                     sunView,
                     sundayColor,
-                    sunsetColor
+                    sunsetColor,
+                    animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
                 )
             }
 
-            AnimationState.SUNSET -> {
+            SUNSET -> {
                 null
             }
 
-            AnimationState.NIGHT -> {
+            NIGHT -> {
                 getDrawableColorAnimator(
                     sunView,
                     sunsetColor,
-                    sunriseColor
+                    sunriseColor,
+                    animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
                 )
             }
 
-            AnimationState.SUNRISE -> {
+            SUNRISE -> {
                 getDrawableColorAnimator(
                     sunView,
                     sunriseColor,
-                    sundayColor
+                    sundayColor,
+                    animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
                 )
             }
         }
@@ -475,27 +587,29 @@ class MainActivity : AppCompatActivity() {
         animationFraction: Float = 0.0F
     ): ValueAnimator? {
         return when (animationsState) {
-            AnimationState.DAY -> {
+            DAY -> {
                 null
             }
 
-            AnimationState.SUNSET -> {
+            SUNSET -> {
                 getDrawableColorAnimator(
                     moonView,
                     moonColor,
-                    moonColorBright
+                    moonColorBright,
+                    animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
                 )
             }
 
-            AnimationState.NIGHT -> {
+            NIGHT -> {
                 getDrawableColorAnimator(
                     moonView,
                     moonColorBright,
-                    moonColor
+                    moonColor,
+                    animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
                 )
             }
 
-            AnimationState.SUNRISE -> {
+            SUNRISE -> {
                 null
             }
         }
@@ -506,35 +620,39 @@ class MainActivity : AppCompatActivity() {
         animationFraction: Float = 0.0F
     ): ValueAnimator? {
         return when (animationsState) {
-            AnimationState.DAY -> {
+            DAY -> {
                 getViewColorAnimator(
                     skyView,
                     skyDayColor,
-                    skySunsetColor
+                    skySunsetColor,
+                    animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
                 )
             }
 
-            AnimationState.SUNSET -> {
+            SUNSET -> {
                 getViewColorAnimator(
                     skyView,
                     skySunsetColor,
-                    skyNightColor
+                    skyNightColor,
+                    animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
                 )
             }
 
-            AnimationState.NIGHT -> {
+            NIGHT -> {
                 getViewColorAnimator(
                     skyView,
                     skyNightColor,
-                    skySunriseColor
+                    skySunriseColor,
+                    animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
                 )
             }
 
-            AnimationState.SUNRISE -> {
+            SUNRISE -> {
                 getViewColorAnimator(
                     skyView,
                     skySunriseColor,
-                    skyDayColor
+                    skyDayColor,
+                    animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
                 )
             }
         }
@@ -545,27 +663,29 @@ class MainActivity : AppCompatActivity() {
         animationFraction: Float = 0.0F
     ): ValueAnimator? {
         return when (animationsState) {
-            AnimationState.DAY -> {
+            DAY -> {
                 null
             }
 
-            AnimationState.SUNSET -> {
+            SUNSET -> {
                 getViewColorAnimator(
                     groundView,
                     groundColor,
-                    groundColorNight
+                    groundColorNight,
+                    animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
                 )
             }
 
-            AnimationState.NIGHT -> {
+            NIGHT -> {
                 getViewColorAnimator(
                     groundView,
                     groundColorNight,
-                    groundColor
+                    groundColor,
+                    animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
                 )
             }
 
-            AnimationState.SUNRISE -> {
+            SUNRISE -> {
                 null
             }
         }
@@ -573,7 +693,6 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         const val ANIM_DURATION = 2000L
-//        private const val ANIM_DURATION_SHORT = 1000L
-        private val LOG_TAG = "MainActivityTag"
+        private const val LOG_TAG = "MainActivityTag"
     }
 }
