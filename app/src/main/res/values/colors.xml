@@ -13,4 +13,5 @@
     <color name="skynight">#131862</color>
     <color name="groundday">#8c3b0c</color>
     <color name="groundnight">#000B0D</color>
+    <color name="cloud">#fff6f6f6</color>
 </resources>

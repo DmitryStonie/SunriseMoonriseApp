@@ -1,50 +1,170 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/scene"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-        <FrameLayout
-            android:id="@+id/sky"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:background="@color/skyday"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/ground"
-            />
-        <ImageView
-            android:id="@+id/sun"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
-            android:layout_gravity="center_horizontal"
-            android:background="@drawable/sun"
+    <FrameLayout
+        android:id="@+id/sky"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/skyday"
+        app:layout_constraintBottom_toTopOf="@id/ground"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/ground"
+    <ImageView
+        android:id="@+id/sun"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/sun"
 
-            />
-        <ImageView
-            android:id="@+id/moon"
-            android:layout_width="90dp"
-            android:layout_height="90dp"
-            android:background="@drawable/moon"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="@id/ground"
-            />
-        <ImageView
-            android:id="@+id/ground"
-            android:layout_width="match_parent"
-            android:layout_height="150dp"
-            android:background="@color/groundday"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            />
+        app:layout_constraintBottom_toTopOf="@id/ground"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+
+        />
+
+    <ImageView
+        android:id="@+id/moon"
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:background="@drawable/moon"
+        app:layout_constraintBottom_toBottomOf="@id/ground"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/ground"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:background="@color/groundday"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/cloud"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="200dp"
+        android:background="@drawable/cloud"
+
+        android:visibility="invisible"
+
+        app:layout_constraintBottom_toTopOf="@id/ground"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+
+        />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/eventsRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+
+        app:layout_constraintBottom_toBottomOf="@+id/ground"
+        app:layout_constraintEnd_toEndOf="@+id/ground"
+        app:layout_constraintStart_toStartOf="@+id/ground"
+        app:layout_constraintTop_toTopOf="@+id/ground" />
+
+    <com.google.android.material.slider.Slider
+        android:id="@+id/slider"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:valueFrom="0"
+        android:valueTo="86400"
+        android:layout_marginTop="150dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!--    <TextView-->
+    <!--        android:id="@+id/sunriseText"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:textColor="@color/white"-->
+    <!--        android:textSize="30sp"-->
+    <!--        android:text="Рассвет:"-->
+
+    <!--        app:layout_constraintStart_toStartOf="@+id/ground"-->
+    <!--        app:layout_constraintTop_toTopOf="@+id/ground"-->
+    <!--        app:layout_constraintBottom_toTopOf="@+id/noonText"-->
+    <!--/>-->
+
+    <!--    <TextView-->
+    <!--        android:id="@+id/noonText"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:textColor="@color/white"-->
+    <!--        android:textSize="30sp"-->
+    <!--        android:text="Полдень:"-->
+
+    <!--        app:layout_constraintStart_toStartOf="@+id/ground"-->
+    <!--        app:layout_constraintBottom_toTopOf="@+id/sunsetText"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/sunriseText"-->
+    <!-- />-->
+
+    <!--    <TextView-->
+    <!--        android:id="@+id/sunsetText"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:textColor="@color/white"-->
+    <!--        android:textSize="30sp"-->
+    <!--        android:text="Закат:"-->
+
+    <!--        app:layout_constraintBottom_toBottomOf="@+id/ground"-->
+    <!--        app:layout_constraintStart_toStartOf="@+id/ground"-->
+    <!--        app:layout_constraintTop_toBottomOf="@+id/noonText"-->
+    <!-- />-->
+
+    <!--    <TextView-->
+    <!--        android:id="@+id/sunriseTime"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:textColor="@color/white"-->
+    <!--        android:textSize="30sp"-->
+    <!--        android:layout_marginEnd="10dp"-->
+
+    <!--        app:layout_constraintBottom_toBottomOf="@+id/sunriseText"-->
+    <!--        app:layout_constraintEnd_toEndOf="@+id/ground"-->
+    <!--        app:layout_constraintTop_toTopOf="@+id/sunriseText"-->
+
+    <!--        tools:text="13:12:02" />-->
+
+    <!--    <TextView-->
+    <!--        android:id="@+id/noonTime"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:textColor="@color/white"-->
+    <!--        android:textSize="30sp"-->
+    <!--        android:layout_marginEnd="10dp"-->
+
+    <!--        app:layout_constraintBottom_toBottomOf="@+id/noonText"-->
+    <!--        app:layout_constraintEnd_toEndOf="@+id/ground"-->
+    <!--        app:layout_constraintTop_toTopOf="@+id/noonText"-->
+
+    <!--        tools:text="13:12:02" />-->
+
+    <!--    <TextView-->
+    <!--        android:id="@+id/sunsetTime"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:textColor="@color/white"-->
+    <!--        android:textSize="30sp"-->
+    <!--        android:layout_marginEnd="10dp"-->
+
+    <!--        app:layout_constraintBottom_toBottomOf="@+id/sunsetText"-->
+    <!--        app:layout_constraintEnd_toEndOf="@+id/ground"-->
+    <!--        app:layout_constraintTop_toTopOf="@+id/sunsetText"-->
+
+    <!--        tools:text="13:12:02" />-->
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
