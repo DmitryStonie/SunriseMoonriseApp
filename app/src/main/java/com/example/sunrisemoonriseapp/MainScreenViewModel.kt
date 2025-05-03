@@ -4,10 +4,28 @@ import android.animation.ValueAnimator
 import androidx.lifecycle.ViewModel
 import com.example.sunrisemoonriseapp.animation.DayAnimation
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.liveData
 import com.example.sunrisemoonriseapp.MainActivity.Companion.ANIM_DURATION
+import com.example.sunrisemoonriseapp.day.Day
+import com.example.sunrisemoonriseapp.day.Day.Companion.NIGHT_START_START_DEFAULT
+import com.example.sunrisemoonriseapp.day.Day.Companion.DAWN_DEFAULT
+import com.example.sunrisemoonriseapp.day.Day.Companion.SUNRISE_DEFAULT
+import com.example.sunrisemoonriseapp.day.Day.Companion.DAY_DEFAULT
+import com.example.sunrisemoonriseapp.day.Day.Companion.SOLAR_NOON_DEFAULT
+import com.example.sunrisemoonriseapp.day.Day.Companion.GOLDEN_HOUR_DEFAULT
+import com.example.sunrisemoonriseapp.day.Day.Companion.SUNSET_DEFAULT
+import com.example.sunrisemoonriseapp.day.Day.Companion.DUSK_DEFAULT
+import com.example.sunrisemoonriseapp.day.Day.Companion.NIGHT_END_START_DEFAULT
+import com.example.sunrisemoonriseapp.day.Day.Companion.NIGHT_END_END_DEFAULT
+import com.example.sunrisemoonriseapp.day.DayState
+import com.example.sunrisemoonriseapp.repository.SunRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
 
-class MainScreenViewModel : ViewModel() {
+@HiltViewModel
+class MainScreenViewModel @Inject constructor(val repository: SunRepository) : ViewModel() {
     var isAnimationPlaying = false
     var state = DayAnimation.Companion.AnimationState.DAY
     var isInitialized = false
@@ -25,6 +43,7 @@ class MainScreenViewModel : ViewModel() {
 
     var animatorsCompleted: Int = 0
 
+    lateinit var day: Day
     fun initAnimators(
         sunAnimator: DayAnimation,
         moonAnimator: DayAnimation,
@@ -117,4 +136,36 @@ class MainScreenViewModel : ViewModel() {
         Log.d("ViewModel", "MainScreenViewModel changed state to ${state}")
     }
 
+    fun getDayInfo(latitude: String, longitude: String) : LiveData<Day?> {
+        return liveData {
+            val data = repository.getSunrise(latitude, longitude)
+            if(data == null){
+                null
+            }
+            val values = arrayListOf(
+                NIGHT_START_START_DEFAULT,
+                if(data?.dawn != null) data.dawn.getSecondsValue() else DAWN_DEFAULT,
+                if(data?.sunrise != null) data.sunrise.getSecondsValue() else SUNRISE_DEFAULT,
+                if(data?.sunrise != null) data.sunrise.getSecondsValue() + 240 else DAY_DEFAULT,
+                if(data?.solarNoon != null) data.solarNoon.getSecondsValue() else SOLAR_NOON_DEFAULT,
+                if(data?.goldenHour != null) data.goldenHour.getSecondsValue() else GOLDEN_HOUR_DEFAULT,
+                if(data?.sunset != null) data.sunset.getSecondsValue() else SUNSET_DEFAULT,
+                if(data?.sunset != null) data.sunset.getSecondsValue() + 240 else DUSK_DEFAULT,
+                if(data?.dusk != null) data.dusk.getSecondsValue() else NIGHT_END_START_DEFAULT,
+                NIGHT_END_END_DEFAULT
+            )
+            day = Day(
+                nightStart = DayState(values[0], values[1] ),
+                dawn = DayState(values[1], values[2]),
+                sunrise = DayState(values[2], values[3]),
+                day = DayState(values[3], values[5]),
+                solarNoon = DayState(values[4], values[4]),
+                goldenHour = DayState(values[5], values[6]),
+                sunset = DayState(values[6], values[7]),
+                dusk = DayState(values[7], values[8]),
+                nightEnd = DayState(values[8], values[9])
+            )
+            emit(day)
+        }
+    }
 }
