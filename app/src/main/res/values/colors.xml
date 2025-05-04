@@ -10,9 +10,9 @@
     <color name="sun_sunday">#FAEFC8</color>
     <color name="sun_goldenhour1">#fdbf00</color>
     <color name="sun_goldenhour2">#ffb400</color>
-    <color name="sun_sunset1">#EB5B00</color>
-    <color name="sun_sunset2">#E4003A</color>
-    <color name="sun_sunset3">#B60071</color>
+    <color name="sun_sunset1">#ff6700</color>
+    <color name="sun_sunset2">#ff4d00</color>
+    <color name="sun_sunset3">#ff0000</color>
     <color name="moon">#e5e5e5</color>
     <color name="moonBright">#F6F1D5</color>
     <color name="sky_dawn1">#c2dbea</color>

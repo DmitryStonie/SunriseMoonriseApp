@@ -1,12 +1,11 @@
 package com.example.sunrisemoonriseapp
 
-import android.animation.ValueAnimator
 import androidx.lifecycle.ViewModel
-import com.example.sunrisemoonriseapp.animation.DayAnimation
 import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
-import com.example.sunrisemoonriseapp.MainActivity.Companion.ANIM_DURATION
+import androidx.lifecycle.viewModelScope
 import com.example.sunrisemoonriseapp.day.Day
 import com.example.sunrisemoonriseapp.day.Day.Companion.NIGHT_START_START_DEFAULT
 import com.example.sunrisemoonriseapp.day.Day.Companion.DAWN_DEFAULT
@@ -21,127 +20,45 @@ import com.example.sunrisemoonriseapp.day.Day.Companion.NIGHT_END_END_DEFAULT
 import com.example.sunrisemoonriseapp.day.DayState
 import com.example.sunrisemoonriseapp.repository.SunRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.util.Calendar
+import java.util.Date
 import javax.inject.Inject
 
 
 @HiltViewModel
 class MainScreenViewModel @Inject constructor(val repository: SunRepository) : ViewModel() {
-    var isAnimationPlaying = false
-    var state = DayAnimation.Companion.AnimationState.DAY
-    var isInitialized = false
-    var isCancelled = false
-    var isUpdated = false
-    var animationCompletionTime = 0L
-
-
-    var sunAnimator: DayAnimation? = null
-    var moonAnimator: DayAnimation? = null
-    var sunColorAnimator: DayAnimation? = null
-    var moonColorAnimator: DayAnimation? = null
-    var skyColorAnimator: DayAnimation? = null
-    var groundColorAnimator: DayAnimation? = null
-
-    var animatorsCompleted: Int = 0
 
     lateinit var day: Day
-    fun initAnimators(
-        sunAnimator: DayAnimation,
-        moonAnimator: DayAnimation,
-        sunColorAnimator: DayAnimation,
-        moonColorAnimator: DayAnimation,
-        skyColorAnimator: DayAnimation,
-        groundColorAnimator: DayAnimation
-    ) {
-        this.sunAnimator = sunAnimator
-        this.moonAnimator = moonAnimator
-        this.sunColorAnimator = sunColorAnimator
-        this.moonColorAnimator = moonColorAnimator
-        this.skyColorAnimator = skyColorAnimator
-        this.groundColorAnimator = groundColorAnimator
-        this.sunAnimator?.state = state
-        this.moonAnimator?.state = state
-        this.sunColorAnimator?.state = state
-        this.moonColorAnimator?.state = state
-        this.skyColorAnimator?.state = state
-        this.groundColorAnimator?.state = state
-        this.sunAnimator!!.onCompleteCallBack = ::onAnimatorComplete
-        this.moonAnimator!!.onCompleteCallBack = ::onAnimatorComplete
-        this.sunColorAnimator!!.onCompleteCallBack = ::onAnimatorComplete
-        this.moonColorAnimator!!.onCompleteCallBack = ::onAnimatorComplete
-        this.skyColorAnimator!!.onCompleteCallBack = ::onAnimatorComplete
-        this.groundColorAnimator!!.onCompleteCallBack = ::onAnimatorComplete
-        isInitialized = true
-    }
+    fun isDayInitialized() = ::day.isInitialized
+    private var systemTime = 0L
+    var timeMultiplier = 1
+    var byTime = true
+    var isRunning = true
 
-    fun startAnimators() {
-        sunAnimator?.isCompleted = false
-        moonAnimator?.isCompleted = false
-        sunColorAnimator?.isCompleted = false
-        moonColorAnimator?.isCompleted = false
-        skyColorAnimator?.isCompleted = false
-        groundColorAnimator?.isCompleted = false
-        continueAnimators()
-    }
-    fun continueAnimators() {
-        Log.d("ViewModel", "MainScreenViewModel started animations from state")
-        isAnimationPlaying = true
-        isCancelled = false
-        sunAnimator?.state = state
-        moonAnimator?.state = state
-        sunColorAnimator?.state = state
-        moonColorAnimator?.state = state
-        skyColorAnimator?.state = state
-        groundColorAnimator?.state = state
-        sunAnimator?.startAnimator()
-        moonAnimator?.startAnimator()
-        sunColorAnimator?.startAnimator()
-        moonColorAnimator?.startAnimator()
-        skyColorAnimator?.startAnimator()
-        groundColorAnimator?.startAnimator()
-    }
-
-    fun stopAnimators() {
-        sunAnimator?.stopAnimator()
-        moonAnimator?.stopAnimator()
-        sunColorAnimator?.stopAnimator()
-        moonColorAnimator?.stopAnimator()
-        skyColorAnimator?.stopAnimator()
-        groundColorAnimator?.stopAnimator()
-        isCancelled = true
-        isUpdated = false
-        isAnimationPlaying = false
-        animationCompletionTime = listOf(
-            (ANIM_DURATION * (1 - (sunAnimator?.animationCompletion ?: 0.0F))),
-            (ANIM_DURATION * (1 - (moonAnimator?.animationCompletion ?: 0.0F))),
-            (ANIM_DURATION * (1 - (sunColorAnimator?.animationCompletion ?: 0.0F))),
-            (ANIM_DURATION * (1 - (moonColorAnimator?.animationCompletion ?: 0.0F))),
-            (ANIM_DURATION * (1 - (skyColorAnimator?.animationCompletion ?: 0.0F))),
-            (ANIM_DURATION * (1 - (groundColorAnimator?.animationCompletion ?: 0.0F)))
-        ).max().toLong()
-    }
-
-    fun onAnimatorComplete(animator: ValueAnimator?) {
-        animatorsCompleted += 1
-        Log.d("ViewModel", "Animators completed ${animatorsCompleted}   animator  $animator")
-        if(animatorsCompleted == 6){
-            finishAnimations()
+    val time: MutableLiveData<Long> by lazy {
+        systemTime = System.currentTimeMillis()
+        viewModelScope.launch {
+            while(true){
+                delay(1000L / timeMultiplier)
+                if(isRunning) {
+                    systemTime += 1000
+                    time.postValue(systemTime)
+                    Log.d("INFO", "time ${time.value}")
+                }
+            }
         }
-    }
-
-    fun finishAnimations(){
-        animatorsCompleted = 0
-        isAnimationPlaying = false
-        isCancelled = false
-        state = DayAnimation.Companion.nextState(state)
-        Log.d("ViewModel", "MainScreenViewModel changed state to ${state}")
-    }
+        MutableLiveData<Long>(systemTime) }
 
     fun getDayInfo(latitude: String, longitude: String) : LiveData<Day?> {
         return liveData {
             val data = repository.getSunrise(latitude, longitude)
             if(data == null){
+                Log.d("INFO", "Got null data")
                 null
             }
+            Log.d("INFO", "Got data")
             val values = arrayListOf(
                 NIGHT_START_START_DEFAULT,
                 if(data?.dawn != null) data.dawn.getSecondsValue() else DAWN_DEFAULT,
@@ -168,4 +85,54 @@ class MainScreenViewModel @Inject constructor(val repository: SunRepository) : V
             emit(day)
         }
     }
+    fun setTime(value: Int){
+        systemTime = System.currentTimeMillis()
+        time.value = systemTime - (getSecondsFromToday() - value)* 1000
+        systemTime = time.value!!
+    }
+    fun resetTime(){
+        systemTime = System.currentTimeMillis()
+        time.value = systemTime
+    }
+
+    fun setSunrise(){
+        systemTime = System.currentTimeMillis()
+        time.value = systemTime - (getSecondsFromToday() - day.sunrise.start )* 1000
+        systemTime = time.value!!
+    }
+
+    fun setSunset(){
+        systemTime = System.currentTimeMillis()
+        time.value = systemTime - (getSecondsFromToday() - day.sunset.start) * 1000
+        systemTime = time.value!!
+    }
+    fun setNoon(){
+        systemTime = System.currentTimeMillis()
+        time.value = systemTime - (getSecondsFromToday() - day.solarNoon.start ) * 1000
+        systemTime = time.value!!
+    }
+    fun setNight(){
+        systemTime = System.currentTimeMillis()
+        time.value = systemTime - getSecondsFromToday() * 1000
+        systemTime = time.value!!
+    }
+
+    private fun getSecondsFromToday(): Int{
+        val date = Date(systemTime)
+        val calendar = Calendar.getInstance()
+        calendar.time = date
+        return calendar.get(Calendar.HOUR_OF_DAY) * 3600 + calendar.get(Calendar.MINUTE) * 60 + calendar.get(
+            Calendar.SECOND)
+    }
+
+    fun setByTime(bool: Boolean, time: Long) {
+        byTime = bool
+        viewModelScope.launch {
+            isRunning = false
+            delay(time)
+            isRunning = true
+        }
+    }
+
+
 }

@@ -1,5 +1,6 @@
 package com.example.sunrisemoonriseapp
 
+import android.animation.AnimatorSet
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
 import android.graphics.drawable.ColorDrawable
@@ -7,13 +8,13 @@ import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.LinearInterpolator
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,6 +24,9 @@ import com.example.sunrisemoonriseapp.recyclerview.EventAdapter
 import com.example.sunrisemoonriseapp.recyclerview.Item
 import com.google.android.material.slider.Slider
 import dagger.hilt.android.AndroidEntryPoint
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 @AndroidEntryPoint
@@ -35,8 +39,20 @@ class MainActivity : AppCompatActivity() {
     private lateinit var groundView: View
     private lateinit var sceneView: View
     private lateinit var eventsRecyclerView: RecyclerView
+    private lateinit var clockView: TextView
+    private lateinit var sunriseButtonView: TextView
+    private lateinit var sunsetButtonView: TextView
+    private lateinit var noonButtonView: TextView
+    private lateinit var nightButtonView: TextView
+    private lateinit var resetButtonView: ImageView
+    private lateinit var x1ButtonView: TextView
+    private lateinit var x10ButtonView: TextView
+    private lateinit var x100ButtonView: TextView
+    private lateinit var x1000ButtonView: TextView
 
     private val viewModel by viewModels<MainScreenViewModel>()
+    private val formatter = SimpleDateFormat("HH:mm:ss", Locale.US)
+    var animations = AnimatorSet()
 
     private val skyDawn1Color: Int by lazy {
         getColor(R.color.sky_dawn1)
@@ -138,13 +154,13 @@ class MainActivity : AppCompatActivity() {
         getColor(R.color.sun_goldenhour2)
     }
     private val sunSunsetColor1: Int by lazy {
-        getColor(R.color.sky_sunset1)
+        getColor(R.color.sun_sunset1)
     }
     private val sunSunsetColor2: Int by lazy {
-        getColor(R.color.sky_sunset1)
+        getColor(R.color.sun_sunset2)
     }
     private val sunSunsetColor3: Int by lazy {
-        getColor(R.color.sky_sunset1)
+        getColor(R.color.sun_sunset3)
     }
     private val moonColor: Int by lazy {
         getColor(R.color.moon)
@@ -173,12 +189,16 @@ class MainActivity : AppCompatActivity() {
         groundView = findViewById(R.id.ground)
         sceneView = findViewById(R.id.scene)
         eventsRecyclerView = findViewById(R.id.eventsRecyclerView)
-
-        sceneView.setOnClickListener {
-            if (!viewModel.isAnimationPlaying) {
-                viewModel.startAnimators()
-            }
-        }
+        clockView = findViewById<TextView>(R.id.clock)
+        sunriseButtonView = findViewById<TextView>(R.id.sunriseButton)
+        sunsetButtonView = findViewById<TextView>(R.id.sunsetButton)
+        noonButtonView = findViewById<TextView>(R.id.noonButton)
+        nightButtonView = findViewById<TextView>(R.id.nightButton)
+        resetButtonView = findViewById<ImageView>(R.id.resetButton)
+        x1ButtonView = findViewById<TextView>(R.id.x1Button)
+        x10ButtonView = findViewById<TextView>(R.id.x10Button)
+        x100ButtonView = findViewById<TextView>(R.id.x100Button)
+        x1000ButtonView = findViewById<TextView>(R.id.x1000Button)
 
         val adapter = EventAdapter(arrayListOf())
         adapter.onClickListener = EventAdapter.OnClickListener {
@@ -212,27 +232,6 @@ class MainActivity : AppCompatActivity() {
             diffResult.dispatchUpdatesTo(adapter)
         }
 
-
-        sceneView.viewTreeObserver.addOnGlobalLayoutListener(
-            OnGlobalLayoutListener {
-                if (!viewModel.isInitialized) {
-                    Log.d(LOG_TAG, "MainActivity initialized ViewModel")
-                } else if (!viewModel.isUpdated) {
-                    Log.d(LOG_TAG, "MainActivity updated ViewModel")
-                }
-                if (viewModel.isCancelled) {
-                    viewModel.continueAnimators()
-                    Log.d(LOG_TAG, "MainActivity started animations")
-                } else {
-                    Log.d(LOG_TAG, "MainActivity updated elements")
-                }
-                cloudView.x = 0F
-                cloudView.isVisible = true
-                val cloudAnimator = getCloudAnimator()
-                cloudAnimator.repeatCount = ValueAnimator.INFINITE
-                cloudAnimator.start()
-            }
-        )
         val slider = findViewById<Slider>(R.id.slider)
         slider.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
             override fun onStartTrackingTouch(slider: Slider) {
@@ -245,44 +244,106 @@ class MainActivity : AppCompatActivity() {
         })
 
         slider.addOnChangeListener { slider, value, fromUser ->
-            getNewSun(viewModel.day, value.toInt(), sunView.y)!!.start()
-            getNewMoon(viewModel.day, value.toInt(), moonView.y)!!.start()
-            getNewSunColor(
-                viewModel.day,
-                value.toInt(),
-                (sunView.background as GradientDrawable).color!!.defaultColor
-            )!!.start()
-            getNewMoonColor(
-                viewModel.day,
-                value.toInt(),
-                (moonView.background as GradientDrawable).color!!.defaultColor
-            )!!.start()
-            getNewSkyColor(
-                viewModel.day,
-                value.toInt(),
-                (skyView.background as ColorDrawable).color
-            )!!.start()
-            getNewGroundColor(
-                viewModel.day,
-                value.toInt(),
-                (groundView.background as ColorDrawable).color
-            )!!.start()
+            animations.cancel()
+            viewModel.setTime(value.toInt())
             Log.d("TIME", "Got time ${value.toInt()} ")
         }
 
-
-    }
-
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d(LOG_TAG, "MainActivity changed orientation")
-        viewModel.isUpdated = false
-        if (viewModel.isAnimationPlaying) {
-            viewModel.stopAnimators()
-            Log.d(LOG_TAG, "MainActivity stopped animators")
+        viewModel.time.observe(this) {
+            val date = Date(it)
+            val calendar = Calendar.getInstance()
+            calendar.time = date
+            clockView.text = formatter.format(Date(it))
+            Log.d("INFO", "Got new time $it   ${clockView.text}")
+            updateAnimations(
+                calendar.get(Calendar.HOUR_OF_DAY) * 3600 + calendar.get(Calendar.MINUTE) * 60 + calendar.get(
+                    Calendar.SECOND
+                ),
+                if(viewModel.byTime){
+                    1000L / viewModel.timeMultiplier
+                } else {
+                    viewModel.setByTime(true,ANIM_DURATION)
+                    ANIM_DURATION
+                }
+            )
         }
+        sunriseButtonView.setOnClickListener {
+            animations.cancel()
+            viewModel.byTime = false
+            viewModel.setSunrise()
+        }
+        sunsetButtonView.setOnClickListener {
+            animations.cancel()
+            viewModel.byTime = false
+            viewModel.setSunset()
+        }
+        noonButtonView.setOnClickListener {
+            animations.cancel()
+            viewModel.byTime = false
+            viewModel.setNoon()
+        }
+        nightButtonView.setOnClickListener {
+            animations.cancel()
+            viewModel.byTime = false
+            viewModel.setNight()
+        }
+        resetButtonView.setOnClickListener {
+            animations.cancel()
+            viewModel.byTime = false
+            viewModel.resetTime()
+        }
+        x1ButtonView.setOnClickListener {
+            viewModel.timeMultiplier = 1
+        }
+        x10ButtonView.setOnClickListener {
+            viewModel.timeMultiplier = 10
+        }
+        x100ButtonView.setOnClickListener {
+            viewModel.timeMultiplier = 100
+        }
+        x1000ButtonView.setOnClickListener {
+            viewModel.timeMultiplier = 1000
+        }
+
     }
+
+    private fun updateAnimations(time: Int, duration: Long) {
+        if (!viewModel.isDayInitialized() || animations.isRunning) {
+            return
+        }
+        Log.d("INFO", "isAnimationsRunning")
+        animations = AnimatorSet()
+        animations.playTogether(
+            getNewSun(viewModel.day, time, sunView.y, duration),
+            getNewMoon(viewModel.day, time, moonView.y, duration),
+            getNewSunColor(
+                viewModel.day,
+                time,
+                (sunView.background as GradientDrawable).color!!.defaultColor,
+                duration
+            ),
+            getNewMoonColor(
+                viewModel.day,
+                time,
+                (moonView.background as GradientDrawable).color!!.defaultColor,
+                duration
+            ),
+            getNewSkyColor(
+                viewModel.day,
+                time,
+                (skyView.background as ColorDrawable).color,
+                duration
+            ),
+            getNewGroundColor(
+                viewModel.day,
+                time,
+                (groundView.background as ColorDrawable).color,
+                duration
+            )
+        )
+        animations.start()
+    }
+
 
     private fun getSunPosition(day: Day, time: Int): Float {
         return if (time >= day.dawn.start && time < day.dawn.end) {
@@ -347,14 +408,15 @@ class MainActivity : AppCompatActivity() {
     fun getMovementAnimator(
         view: View,
         startPos: Float,
-        endPos: Float
+        endPos: Float,
+        dur: Long = ANIM_DURATION
     ): ValueAnimator {
         return ValueAnimator.ofFloat(
             startPos, endPos
         )
             .apply {
                 interpolator = AccelerateInterpolator()
-                duration = ANIM_DURATION
+                duration = dur
                 addUpdateListener { animator ->
                     view.y = animator.animatedValue as Float
                 }
@@ -364,13 +426,15 @@ class MainActivity : AppCompatActivity() {
     private fun getViewColorAnimator(
         view: View,
         startColor: Int,
-        endColor: Int): ValueAnimator {
+        endColor: Int,
+        dur: Long = ANIM_DURATION
+    ): ValueAnimator {
         return ValueAnimator.ofObject(
             ArgbEvaluator(),
             startColor,
             endColor
         ).apply {
-            duration = ANIM_DURATION
+            duration = dur
             addUpdateListener { animator ->
                 view.setBackgroundColor(
                     animator.animatedValue as Int
@@ -398,289 +462,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-//    private fun getSunAnimations(animationFraction: Float = 0.0F): HashMap<AnimationState, ValueAnimator?> {
-//        val result = HashMap<AnimationState, ValueAnimator?>()
-//        for (state in AnimationState.entries) {
-////            result[state] = getSunAnimator(state, animationFraction)
-//        }
-//        return result
-//    }
-//
-//    private fun getMoonAnimations(animationFraction: Float = 0.0F): HashMap<AnimationState, ValueAnimator?> {
-//        val result = HashMap<AnimationState, ValueAnimator?>()
-//        for (state in AnimationState.entries) {
-////            result[state] = getMoonAnimator(state, animationFraction)
-//        }
-//        return result
-//    }
-//
-//    private fun getSunColorAnimations(animationFraction: Float = 0.0F): HashMap<AnimationState, ValueAnimator?> {
-//        val result = HashMap<AnimationState, ValueAnimator?>()
-//        for (state in AnimationState.entries) {
-////            result[state] = getSunColorAnimator(state, animationFraction)
-//        }
-//        return result
-//    }
-//
-//    private fun getMoonColorAnimations(animationFraction: Float = 0.0F): HashMap<AnimationState, ValueAnimator?> {
-//        val result = HashMap<AnimationState, ValueAnimator?>()
-//        for (state in AnimationState.entries) {
-////            result[state] = getMoonColorAnimator(state, animationFraction)
-//        }
-//        return result
-//    }
-//
-//    private fun getSkyColorAnimations(animationFraction: Float = 0.0F): HashMap<AnimationState, ValueAnimator?> {
-//        val result = HashMap<AnimationState, ValueAnimator?>()
-//        for (state in AnimationState.entries) {
-////            result[state] = getSkyColorAnimator(state, animationFraction)
-//        }
-//        return result
-//    }
-//
-//    private fun getGroundColorAnimations(animationFraction: Float = 0.0F): HashMap<AnimationState, ValueAnimator?> {
-//        val result = HashMap<AnimationState, ValueAnimator?>()
-//        for (state in AnimationState.entries) {
-////            result[state] = getGroundColorAnimator(state, animationFraction)
-//        }
-//        return result
-//    }
-
-//    private fun getSunAnimator(
-//        animationsState: AnimationState,
-//        animationFraction: Float = 0.0F
-//    ): ValueAnimator? {
-//        return when (animationsState) {
-//            DAY -> {
-//                getMovementAnimator(
-//                    sunView,
-//                    getSunPosition(DAY) + animationFraction * (getSunPosition(
-//                        SUNSET
-//                    ) - getSunPosition(DAY)),
-//                    getSunPosition(SUNSET),
-//                    animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
-//                )
-//            }
-//
-//            SUNSET -> {
-//                getMovementAnimator(
-//                    sunView,
-//                    getSunPosition(SUNSET) + animationFraction * (getSunPosition(
-//                        NIGHT
-//                    ) - getSunPosition(SUNSET)),
-//                    getSunPosition(NIGHT),
-//                    animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
-//                )
-//            }
-//
-//            NIGHT -> {
-//                getMovementAnimator(
-//                    sunView,
-//                    getSunPosition(NIGHT) + animationFraction * (getSunPosition(
-//                        SUNRISE
-//                    ) - getSunPosition(NIGHT)),
-//                    getSunPosition(SUNRISE),
-//                    animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
-//                )
-//            }
-//
-//            SUNRISE -> {
-//                getMovementAnimator(
-//                    sunView,
-//                    getSunPosition(SUNRISE) + animationFraction * (getSunPosition(
-//                        DAY
-//                    ) - getSunPosition(SUNRISE)),
-//                    getSunPosition(DAY),
-//                    animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
-//                )
-//            }
-//        }
-//    }
-
-//    private fun getMoonAnimator(
-//        animationsState: AnimationState,
-//        animationFraction: Float = 0.0F
-//    ): ValueAnimator? {
-//        return when (animationsState) {
-//            DAY -> {
-//                null
-//            }
-//
-//            SUNSET -> {
-//                getMovementAnimator(
-//                    moonView,
-//                    getMoonPosition(SUNSET) + animationFraction * (getMoonPosition(
-//                        NIGHT
-//                    ) - getMoonPosition(SUNSET)),
-//                    getMoonPosition(NIGHT),
-//                    animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
-//                )
-//            }
-//
-//            NIGHT -> {
-//                getMovementAnimator(
-//                    moonView,
-//                    getMoonPosition(NIGHT) + animationFraction * (getMoonPosition(
-//                        SUNRISE
-//                    ) - getMoonPosition(NIGHT)),
-//                    getMoonPosition(SUNRISE),
-//                    animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
-//                )
-//            }
-//
-//            SUNRISE -> {
-//                null
-//            }
-//        }
-//    }
-
-//    private fun getSunColorAnimator(
-//        animationsState: AnimationState,
-//        animationFraction: Float = 0.0F
-//    ): ValueAnimator? {
-//        return when (animationsState) {
-//            DAY -> {
-//                getDrawableColorAnimator(
-//                    sunView,
-//                    sundayColor,
-//                    sunsetColor,
-//                    animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
-//                )
-//            }
-//
-//            SUNSET -> {
-//                null
-//            }
-//
-//            NIGHT -> {
-//                getDrawableColorAnimator(
-//                    sunView,
-//                    sunsetColor,
-//                    sunriseColor,
-//                    animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
-//                )
-//            }
-//
-//            SUNRISE -> {
-//                getDrawableColorAnimator(
-//                    sunView,
-//                    sunriseColor,
-//                    sundayColor,
-//                    animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
-//                )
-//            }
-//        }
-//    }
-
-//    private fun getMoonColorAnimator(
-//        animationsState: AnimationState,
-//        animationFraction: Float = 0.0F
-//    ): ValueAnimator? {
-//        return when (animationsState) {
-//            DAY -> {
-//                null
-//            }
-//
-//            SUNSET -> {
-//                getDrawableColorAnimator(
-//                    moonView,
-//                    moonColor,
-//                    moonColorBright,
-//                    animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
-//                )
-//            }
-//
-//            NIGHT -> {
-//                getDrawableColorAnimator(
-//                    moonView,
-//                    moonColorBright,
-//                    moonColor,
-//                    animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
-//                )
-//            }
-//
-//            SUNRISE -> {
-//                null
-//            }
-//        }
-//    }
-
-//    private fun getSkyColorAnimator(
-//        animationsState: AnimationState,
-//        animationFraction: Float = 0.0F
-//    ): ValueAnimator? {
-//        return when (animationsState) {
-//            DAY -> {
-//                getViewColorAnimator(
-//                    skyView,
-//                    skyDayColor,
-//                    skySunsetColor,
-//                    animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
-//                )
-//            }
-//
-//            SUNSET -> {
-//                getViewColorAnimator(
-//                    skyView,
-//                    skySunsetColor,
-//                    skyNightColor,
-//                    animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
-//                )
-//            }
-//
-//            NIGHT -> {
-//                getViewColorAnimator(
-//                    skyView,
-//                    skyNightColor,
-//                    skySunriseColor,
-//                    animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
-//                )
-//            }
-//
-//            SUNRISE -> {
-//                getViewColorAnimator(
-//                    skyView,
-//                    skySunriseColor,
-//                    skyDayColor,
-//                    animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
-//                )
-//            }
-//        }
-//    }
-//
-//    private fun getGroundColorAnimator(
-//        animationsState: AnimationState,
-//        animationFraction: Float = 0.0F
-//    ): ValueAnimator? {
-//        return when (animationsState) {
-//            DAY -> {
-//                null
-//            }
-//
-//            SUNSET -> {
-//                getViewColorAnimator(
-//                    groundView,
-//                    groundColor,
-//                    groundColorNight,
-//                    animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
-//                )
-//            }
-//
-//            NIGHT -> {
-//                getViewColorAnimator(
-//                    groundView,
-//                    groundColorNight,
-//                    groundColor,
-//                    animDuration = (ANIM_DURATION * (1 - animationFraction)).toLong()
-//                )
-//            }
-//
-//            SUNRISE -> {
-//                null
-//            }
-//        }
-//    }
 
     private fun getCloudAnimator(
     ): ValueAnimator {
@@ -724,7 +505,7 @@ class MainActivity : AppCompatActivity() {
             l = e - s
             if (time >= s && time < s + l * 0.5) {
                 sunGoldenHour1Color
-            } else{
+            } else {
                 sunGoldenHour2Color
             }
         } else if (time >= day.sunset.start && time < day.sunset.end) {
@@ -733,9 +514,9 @@ class MainActivity : AppCompatActivity() {
             l = e - s
             if (time >= s && time < s + l * 0.33) {
                 sunSunsetColor1
-            } else if(time >= s + l * 0.33 && time < s + l * 0.66) {
+            } else if (time >= s + l * 0.33 && time < s + l * 0.66) {
                 sunSunsetColor2
-            }else{
+            } else {
                 sunSunsetColor3
             }
         } else {
@@ -767,98 +548,98 @@ class MainActivity : AppCompatActivity() {
         var s = 0
         var e = 0
         var l = 0
-        return if(time >= day.dawn.start && time < day.dawn.end){
+        return if (time >= day.dawn.start && time < day.dawn.end) {
             s = day.dawn.start
             e = day.dawn.end
             l = e - s
-            if(time >= s && time < s + l * 0.2){
+            if (time >= s && time < s + l * 0.2) {
                 skyDawn1Color
-            } else if(time >= s + l * 0.2 && time < s + l * 0.4){
+            } else if (time >= s + l * 0.2 && time < s + l * 0.4) {
                 skyDawn2Color
-            } else if(time >= s + l * 0.4 && time < s + l * 0.6){
+            } else if (time >= s + l * 0.4 && time < s + l * 0.6) {
                 skyDawn3Color
-            } else if(time >= s + l * 0.6 && time < s + l * 0.8){
+            } else if (time >= s + l * 0.6 && time < s + l * 0.8) {
                 skyDawn4Color
-            } else{
+            } else {
                 skyDawn5Color
             }
-        } else if(time >= day.sunrise.start && time < day.sunrise.end){
+        } else if (time >= day.sunrise.start && time < day.sunrise.end) {
             s = day.sunrise.start
             e = day.sunrise.end
             l = e - s
-            if(time >= s && time < s + l * 0.2){
+            if (time >= s && time < s + l * 0.2) {
                 skySunrise1Color
-            } else if(time >= s + l * 0.2 && time < s + l * 0.4){
+            } else if (time >= s + l * 0.2 && time < s + l * 0.4) {
                 skySunrise2Color
-            } else if(time >= s + l * 0.4 && time < s + l * 0.6){
+            } else if (time >= s + l * 0.4 && time < s + l * 0.6) {
                 skySunrise3Color
-            } else if(time >= s + l * 0.6 && time < s + l * 0.8){
+            } else if (time >= s + l * 0.6 && time < s + l * 0.8) {
                 skySunrise4Color
-            } else{
+            } else {
                 skySunrise5Color
             }
-        } else if(time >= day.day.start && time < day.solarNoon.start){
+        } else if (time >= day.day.start && time < day.solarNoon.start) {
             s = day.day.start
             e = day.solarNoon.start
             l = e - s
-            if(time >= s && time < s + l * 0.25){
+            if (time >= s && time < s + l * 0.25) {
                 skyDay1Color
-            } else if(time >= s + l * 0.25 && time < s + l * 0.5){
+            } else if (time >= s + l * 0.25 && time < s + l * 0.5) {
                 skyDay2Color
-            } else if(time >= s + l * 0.5 && time < s + l * 0.75){
+            } else if (time >= s + l * 0.5 && time < s + l * 0.75) {
                 skyDay3Color
-            }else{
+            } else {
                 skyDay4Color
             }
-        } else if(time >= day.solarNoon.end && time < day.day.end){
+        } else if (time >= day.solarNoon.end && time < day.day.end) {
             s = day.solarNoon.end
             e = day.day.end
             l = e - s
-            if(time >= s && time < s + l * 0.25){
+            if (time >= s && time < s + l * 0.25) {
                 skyDay4Color
-            } else if(time >= s + l * 0.25 && time < s + l * 0.5){
+            } else if (time >= s + l * 0.25 && time < s + l * 0.5) {
                 skyDay3Color
-            } else if(time >= s + l * 0.5 && time < s + l * 0.75){
+            } else if (time >= s + l * 0.5 && time < s + l * 0.75) {
                 skyDay2Color
-            }else{
+            } else {
                 skyDay1Color
             }
-        } else if(time >= day.goldenHour.start && time < day.goldenHour.end){
+        } else if (time >= day.goldenHour.start && time < day.goldenHour.end) {
             s = day.goldenHour.start
             e = day.goldenHour.end
             l = e - s
-            if(time >= s && time < s + l * 0.5){
+            if (time >= s && time < s + l * 0.5) {
                 skyGoldenHour1Color
             } else {
                 skyGoldenHour2Color
             }
-        } else if(time >= day.sunset.start && time < day.sunset.end){
+        } else if (time >= day.sunset.start && time < day.sunset.end) {
             s = day.sunset.start
             e = day.sunset.end
             l = e - s
-            if(time >= s && time < s + l * 0.33){
+            if (time >= s && time < s + l * 0.33) {
                 skySunset1Color
-            } else if(time >= s + l*0.33 && time < s + l * 0.66){
+            } else if (time >= s + l * 0.33 && time < s + l * 0.66) {
                 skySunset2Color
-            } else{
+            } else {
                 skySunset3Color
             }
-        } else if(time >= day.dusk.start && time < day.dusk.end){
+        } else if (time >= day.dusk.start && time < day.dusk.end) {
             s = day.dusk.start
             e = day.dusk.end
             l = e - s
-            if(time >= s && time < s + l * 0.2){
+            if (time >= s && time < s + l * 0.2) {
                 skyDuskColor1
-            } else if(time >= s + l * 0.2 && time < s + l * 0.4){
+            } else if (time >= s + l * 0.2 && time < s + l * 0.4) {
                 skyDuskColor2
-            } else if(time >= s + l * 0.4 && time < s + l * 0.6){
+            } else if (time >= s + l * 0.4 && time < s + l * 0.6) {
                 skyDuskColor3
-            } else if(time >= s + l * 0.6 && time < s + l * 0.8){
+            } else if (time >= s + l * 0.6 && time < s + l * 0.8) {
                 skyDuskColor4
-            } else{
+            } else {
                 skyDuskColor5
             }
-        } else{
+        } else {
             skyNightColor
         }
     }
@@ -866,68 +647,85 @@ class MainActivity : AppCompatActivity() {
     private fun getNewMoon(
         day: Day,
         time: Int,
-        currentPos: Float
+        currentPos: Float,
+        duration: Long
     ): ValueAnimator? {
         return getMovementAnimator(
             moonView,
             currentPos,
-            getMoonPosition(day, time))
+            getMoonPosition(day, time),
+            duration
+        )
     }
 
     private fun getNewSun(
         day: Day,
         time: Int,
-        currentPos: Float
+        currentPos: Float,
+        duration: Long
     ): ValueAnimator? {
         return getMovementAnimator(
             sunView,
             currentPos,
-            getSunPosition(day, time))
+            getSunPosition(day, time),
+            duration
+        )
     }
 
     private fun getNewSunColor(
         day: Day,
         time: Int,
-        currentColor: Int
+        currentColor: Int,
+        duration: Long
     ): ValueAnimator? {
         return getDrawableColorAnimator(
             sunView,
             currentColor,
-            getSunColor(day, time))
+            getSunColor(day, time),
+            duration
+        )
     }
 
     private fun getNewMoonColor(
         day: Day,
         time: Int,
-        currentColor: Int
+        currentColor: Int,
+        duration: Long
     ): ValueAnimator? {
         return getDrawableColorAnimator(
             moonView,
             currentColor,
-            getMoonColor(day, time)
+            getMoonColor(day, time),
+            duration
         )
     }
 
     private fun getNewSkyColor(
         day: Day,
         time: Int,
-        currentColor: Int
+        currentColor: Int,
+        duration: Long
     ): ValueAnimator? {
         return getViewColorAnimator(
             skyView,
             currentColor,
-            getSkyColor(day, time))
+            getSkyColor(day, time),
+            duration
+        )
     }
 
     private fun getNewGroundColor(
         day: Day,
         time: Int,
-        currentColor: Int
+        currentColor: Int,
+        duration: Long
     ): ValueAnimator? {
         return getViewColorAnimator(
             groundView,
             currentColor,
-            getGroundColor(day, time))
+            getGroundColor(day, time),
+            duration
+        )
     }
 
     companion object {
