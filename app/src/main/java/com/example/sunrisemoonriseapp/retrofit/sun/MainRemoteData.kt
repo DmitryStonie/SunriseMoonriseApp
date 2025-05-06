@@ -1,4 +1,4 @@
-package com.example.sunrisemoonriseapp.retrofit
+package com.example.sunrisemoonriseapp.retrofit.sun
 
 import javax.inject.Inject
 

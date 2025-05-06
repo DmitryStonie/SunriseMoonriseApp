@@ -1,7 +1,6 @@
 package com.example.sunrisemoonriseapp.repository
 
-import com.example.sunrisemoonriseapp.retrofit.MainRemoteData
-import com.example.sunrisemoonriseapp.retrofit.SunriseApiResponse
+import com.example.sunrisemoonriseapp.retrofit.sun.MainRemoteData
 import javax.inject.Inject
 import javax.inject.Singleton
 

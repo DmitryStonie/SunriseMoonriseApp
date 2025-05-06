@@ -18,7 +18,9 @@ import com.example.sunrisemoonriseapp.day.Day.Companion.DUSK_DEFAULT
 import com.example.sunrisemoonriseapp.day.Day.Companion.NIGHT_END_START_DEFAULT
 import com.example.sunrisemoonriseapp.day.Day.Companion.NIGHT_END_END_DEFAULT
 import com.example.sunrisemoonriseapp.day.DayState
+import com.example.sunrisemoonriseapp.repository.MoonRepository
 import com.example.sunrisemoonriseapp.repository.SunRepository
+import com.example.sunrisemoonriseapp.retrofit.moon.MoonDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -28,7 +30,7 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class MainScreenViewModel @Inject constructor(val repository: SunRepository) : ViewModel() {
+class MainScreenViewModel @Inject constructor(val sunRepository: SunRepository, val moonRepository: MoonRepository) : ViewModel() {
 
     lateinit var day: Day
     fun isDayInitialized() = ::day.isInitialized
@@ -45,7 +47,7 @@ class MainScreenViewModel @Inject constructor(val repository: SunRepository) : V
                 if(isRunning) {
                     systemTime += 1000
                     time.postValue(systemTime)
-                    Log.d("INFO", "time ${time.value}")
+//                    Log.d("INFO", "time ${time.value}")
                 }
             }
         }
@@ -53,7 +55,7 @@ class MainScreenViewModel @Inject constructor(val repository: SunRepository) : V
 
     fun getDayInfo(latitude: String, longitude: String) : LiveData<Day?> {
         return liveData {
-            val data = repository.getSunrise(latitude, longitude)
+            val data = sunRepository.getSunrise(latitude, longitude)
             if(data == null){
                 Log.d("INFO", "Got null data")
                 null
@@ -133,6 +135,15 @@ class MainScreenViewModel @Inject constructor(val repository: SunRepository) : V
             isRunning = true
         }
     }
+
+    fun getMoonInfo(): LiveData<MoonDate>{
+        return liveData {
+            val moonDate = moonRepository.getMoon(if(systemTime == 0L) System.currentTimeMillis() / 1000  else systemTime / 1000 )
+            emit(moonDate ?: MoonDate(0, "", "", arrayListOf(""), 0, 0.0,"", 0.0F,0.0,0.0,0.0,0.0))
+        }
+    }
+
+
 
 
 }

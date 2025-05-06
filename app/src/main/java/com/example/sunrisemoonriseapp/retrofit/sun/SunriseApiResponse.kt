@@ -1,4 +1,4 @@
-package com.example.sunrisemoonriseapp.retrofit
+package com.example.sunrisemoonriseapp.retrofit.sun
 
 import com.example.sunrisemoonriseapp.repository.Sunrise
 
