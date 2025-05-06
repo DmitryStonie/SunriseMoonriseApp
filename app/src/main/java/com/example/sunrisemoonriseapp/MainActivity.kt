@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.View
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.LinearInterpolator
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
@@ -22,18 +23,23 @@ import com.example.sunrisemoonriseapp.day.Day
 import com.example.sunrisemoonriseapp.recyclerview.DiffUtilCallback
 import com.example.sunrisemoonriseapp.recyclerview.EventAdapter
 import com.example.sunrisemoonriseapp.recyclerview.Item
+import com.example.sunrisemoonriseapp.retrofit.moon.MoonDate
+import com.example.sunrisemoonriseapp.ui.CustomPainter
+import com.example.sunrisemoonriseapp.ui.MoonPainter
 import com.google.android.material.slider.Slider
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import kotlin.math.abs
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var sunView: View
     private lateinit var moonView: View
+    private lateinit var moonViewLayout: FrameLayout
     private lateinit var skyView: View
     private lateinit var cloudView: View
     private lateinit var groundView: View
@@ -168,12 +174,16 @@ class MainActivity : AppCompatActivity() {
     private val moonColorBright: Int by lazy {
         getColor(R.color.moonBright)
     }
+    private val moonColorDark: Int by lazy {
+        getColor(R.color.moonDark)
+    }
     private val groundColor: Int by lazy {
         getColor(R.color.ground_day)
     }
     private val groundColorNight: Int by lazy {
         getColor(R.color.ground_night)
     }
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -183,7 +193,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         sunView = findViewById(R.id.sun)
-        moonView = findViewById(R.id.moon)
+        moonViewLayout = findViewById<FrameLayout>(R.id.moon)
         cloudView = findViewById(R.id.cloud)
         skyView = findViewById(R.id.sky)
         groundView = findViewById(R.id.ground)
@@ -199,7 +209,6 @@ class MainActivity : AppCompatActivity() {
         x10ButtonView = findViewById<TextView>(R.id.x10Button)
         x100ButtonView = findViewById<TextView>(R.id.x100Button)
         x1000ButtonView = findViewById<TextView>(R.id.x1000Button)
-
         val adapter = EventAdapter(arrayListOf())
         adapter.onClickListener = EventAdapter.OnClickListener {
             Log.d("CLICK", "Item clicked {$it}")
@@ -215,7 +224,7 @@ class MainActivity : AppCompatActivity() {
             if (day == null) {
                 Log.d("DATA", "day is null")
             } else {
-                Log.d("TIME", day.toString())
+//                Log.d("TIME", day.toString())
                 events.add(
                     Item(
                         "Длина дня",
@@ -230,6 +239,25 @@ class MainActivity : AppCompatActivity() {
             val diffResult = DiffUtil.calculateDiff(diffUtilCallback)
             adapter.events = events
             diffResult.dispatchUpdatesTo(adapter)
+        }
+        viewModel.getMoonInfo().observe(this){
+            Log.d("INFO", "Got moon api response $it")
+            val width = abs(2 * it.illumination - 1F).toFloat()
+            val painter = if(it.age < MoonDate.FULL_MOON_AGE){
+                if(it.illumination <= 0.5F){
+                    MoonPainter(moonColorBright, moonColorDark, leftWidth = width)
+                } else{
+                    MoonPainter(moonColorDark, moonColorBright, rightWidth = width)
+                }
+            } else{
+                if(it.illumination > 0.5F){
+                    MoonPainter(moonColorDark, moonColorBright, leftWidth = width)
+                } else{
+                    MoonPainter(moonColorBright, moonColorDark, rightWidth = width)
+                }
+            }
+            moonView = CustomPainter(this, 90, 90, painter)
+            moonViewLayout.addView(moonView)
         }
 
         val slider = findViewById<Slider>(R.id.slider)
@@ -254,7 +282,7 @@ class MainActivity : AppCompatActivity() {
             val calendar = Calendar.getInstance()
             calendar.time = date
             clockView.text = formatter.format(Date(it))
-            Log.d("INFO", "Got new time $it   ${clockView.text}")
+//            Log.d("INFO", "Got new time $it   ${clockView.text}")
             updateAnimations(
                 calendar.get(Calendar.HOUR_OF_DAY) * 3600 + calendar.get(Calendar.MINUTE) * 60 + calendar.get(
                     Calendar.SECOND
@@ -305,6 +333,7 @@ class MainActivity : AppCompatActivity() {
             viewModel.timeMultiplier = 1000
         }
 
+
     }
 
     private fun updateAnimations(time: Int, duration: Long) {
@@ -315,19 +344,19 @@ class MainActivity : AppCompatActivity() {
         animations = AnimatorSet()
         animations.playTogether(
             getNewSun(viewModel.day, time, sunView.y, duration),
-            getNewMoon(viewModel.day, time, moonView.y, duration),
+            getNewMoon(viewModel.day, time, moonViewLayout.y, duration),
             getNewSunColor(
                 viewModel.day,
                 time,
                 (sunView.background as GradientDrawable).color!!.defaultColor,
                 duration
             ),
-            getNewMoonColor(
-                viewModel.day,
-                time,
-                (moonView.background as GradientDrawable).color!!.defaultColor,
-                duration
-            ),
+//            getNewMoonColor(
+//                viewModel.day,
+//                time,
+//                (moonView.background as GradientDrawable).color!!.defaultColor,
+//                duration
+//            ),
             getNewSkyColor(
                 viewModel.day,
                 time,
@@ -651,7 +680,7 @@ class MainActivity : AppCompatActivity() {
         duration: Long
     ): ValueAnimator? {
         return getMovementAnimator(
-            moonView,
+            moonViewLayout,
             currentPos,
             getMoonPosition(day, time),
             duration

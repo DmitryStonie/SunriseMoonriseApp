@@ -15,6 +15,7 @@
     <color name="sun_sunset3">#ff0000</color>
     <color name="moon">#e5e5e5</color>
     <color name="moonBright">#F6F1D5</color>
+    <color name="moonDark">#31302E</color>
     <color name="sky_dawn1">#c2dbea</color>
     <color name="sky_dawn2">#c2cfea</color>
     <color name="sky_dawn3">#c2c5ea</color>

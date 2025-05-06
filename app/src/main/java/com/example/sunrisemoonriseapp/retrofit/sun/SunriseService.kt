@@ -1,4 +1,4 @@
-package com.example.sunrisemoonriseapp.retrofit
+package com.example.sunrisemoonriseapp.retrofit.sun
 
 import retrofit2.Response
 import retrofit2.http.GET

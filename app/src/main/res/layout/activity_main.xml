@@ -29,11 +29,10 @@
 
         />
 
-    <ImageView
+    <FrameLayout
         android:id="@+id/moon"
         android:layout_width="90dp"
         android:layout_height="90dp"
-        android:background="@drawable/moon"
         app:layout_constraintBottom_toBottomOf="@id/ground"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -62,6 +61,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
 
+        />
+
+    <FrameLayout
+        android:id="@+id/placeToDraw"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         />
 
     <androidx.recyclerview.widget.RecyclerView
