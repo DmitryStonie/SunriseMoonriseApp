@@ -1,6 +1,6 @@
 package com.example.sunrisemoonriseapp.di
 
-import com.example.sunrisemoonriseapp.retrofit.sun.MainRemoteData
+import com.example.sunrisemoonriseapp.retrofit.sun.SunRemoteData
 import com.example.sunrisemoonriseapp.retrofit.sun.SunriseService
 import dagger.Module
 import dagger.Provides
@@ -33,5 +33,5 @@ object RetrofitSunModule {
 
     @Provides
     @Singleton
-    fun provideMainRemoteData(sunriseService: SunriseService): MainRemoteData = MainRemoteData(sunriseService)
+    fun provideMainRemoteData(sunriseService: SunriseService): SunRemoteData = SunRemoteData(sunriseService)
 }

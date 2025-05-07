@@ -28,8 +28,4 @@ data class MoonDate (
     @SerializedName(value="SunAngularDiameter")
     val sunAngularDiameter: Double
 
-){
-    companion object{
-        const val FULL_MOON_AGE = 14.7F
-    }
-}
+)
