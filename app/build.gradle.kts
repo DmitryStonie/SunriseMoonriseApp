@@ -73,6 +73,9 @@ dependencies {
     implementation("androidx.room:room-runtime:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
     kapt("androidx.room:room-compiler:$room_version")
+    //MapKit
+    val mapkit_version = "4.15.0-lite"
+    implementation("com.yandex.android:maps.mobile:$mapkit_version")
 }
 
 kapt {
