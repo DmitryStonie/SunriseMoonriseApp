@@ -20,10 +20,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.sunrisemoonriseapp.day.Day
+import com.example.sunrisemoonriseapp.entities.Moon
 import com.example.sunrisemoonriseapp.recyclerview.DiffUtilCallback
 import com.example.sunrisemoonriseapp.recyclerview.EventAdapter
 import com.example.sunrisemoonriseapp.recyclerview.Item
-import com.example.sunrisemoonriseapp.retrofit.moon.MoonDate
 import com.example.sunrisemoonriseapp.ui.CustomPainter
 import com.example.sunrisemoonriseapp.ui.MoonPainter
 import com.google.android.material.slider.Slider
@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var x1000ButtonView: TextView
 
     private val viewModel by viewModels<MainScreenViewModel>()
-    private val formatter = SimpleDateFormat("HH:mm:ss", Locale.US)
+    private val formatter = SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.US)
     var animations = AnimatorSet()
 
     private val skyDawn1Color: Int by lazy {
@@ -184,8 +184,6 @@ class MainActivity : AppCompatActivity() {
         getColor(R.color.ground_night)
     }
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(LOG_TAG, "MainActivity successfully created $this")
         super.onCreate(savedInstanceState)
@@ -219,12 +217,18 @@ class MainActivity : AppCompatActivity() {
 
         val latitude = "55.0415"
         val longitude = "82.9346"
-        viewModel.getDayInfo(latitude, longitude).observe(this) { day ->
+        var curDate = -1
+        viewModel.getDayInfo(latitude, longitude)
+        viewModel.dayInfo.observe(this) { day ->
+            val date = Date(viewModel.time.value ?: 0)
+            val calendar = Calendar.getInstance()
+            calendar.time = date
+            curDate = calendar.get(Calendar.DATE)
             val events = ArrayList<Item>()
             if (day == null) {
                 Log.d("DATA", "day is null")
             } else {
-//                Log.d("TIME", day.toString())
+                Log.d("TIME", day.toString())
                 events.add(
                     Item(
                         "Длина дня",
@@ -240,10 +244,11 @@ class MainActivity : AppCompatActivity() {
             adapter.events = events
             diffResult.dispatchUpdatesTo(adapter)
         }
-        viewModel.getMoonInfo().observe(this){
+        viewModel.getMoonInfo()
+            viewModel.moonInfo.observe(this){
             Log.d("INFO", "Got moon api response $it")
             val width = abs(2 * it.illumination - 1F).toFloat()
-            val painter = if(it.age < MoonDate.FULL_MOON_AGE){
+            val painter = if(it.age < Moon.FULL_MOON_AGE){
                 if(it.illumination <= 0.5F){
                     MoonPainter(moonColorBright, moonColorDark, leftWidth = width)
                 } else{
@@ -294,6 +299,11 @@ class MainActivity : AppCompatActivity() {
                     ANIM_DURATION
                 }
             )
+            if(calendar.get(Calendar.DATE) > curDate && curDate != -1){
+                viewModel.getDayInfo(latitude, longitude)
+                viewModel.getMoonInfo()
+                curDate = calendar.get(Calendar.DATE)
+            }
         }
         sunriseButtonView.setOnClickListener {
             animations.cancel()
@@ -340,7 +350,7 @@ class MainActivity : AppCompatActivity() {
         if (!viewModel.isDayInitialized() || animations.isRunning) {
             return
         }
-        Log.d("INFO", "isAnimationsRunning")
+//        Log.d("INFO", "isAnimationsRunning")
         animations = AnimatorSet()
         animations.playTogether(
             getNewSun(viewModel.day, time, sunView.y, duration),

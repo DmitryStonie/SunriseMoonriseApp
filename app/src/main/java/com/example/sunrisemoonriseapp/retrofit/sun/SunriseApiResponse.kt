@@ -1,8 +1,8 @@
 package com.example.sunrisemoonriseapp.retrofit.sun
 
-import com.example.sunrisemoonriseapp.repository.Sunrise
+import com.example.sunrisemoonriseapp.entities.Day
 
 data class SunriseApiResponse(
-    val results: Sunrise?,
+    val results: Day?,
     val status: String
 )

@@ -1,7 +1,7 @@
-package com.example.sunrisemoonriseapp.repository
+package com.example.sunrisemoonriseapp.entities
 
-data class Sunrise(
-    val date: String?,
+data class Day(
+    val date: String,
     val sunrise: String?,
     val sunset: String?,
     val firstLight: String?,
@@ -12,5 +12,5 @@ data class Sunrise(
     val goldenHour: String?,
     val dayLength: String?,
     val timezone: String?,
-    val urcOffset: Int?
+    val urcOffset: Int
 )

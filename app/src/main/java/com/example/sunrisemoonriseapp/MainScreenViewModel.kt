@@ -2,9 +2,7 @@ package com.example.sunrisemoonriseapp
 
 import androidx.lifecycle.ViewModel
 import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.example.sunrisemoonriseapp.day.Day
 import com.example.sunrisemoonriseapp.day.Day.Companion.NIGHT_START_START_DEFAULT
@@ -18,19 +16,24 @@ import com.example.sunrisemoonriseapp.day.Day.Companion.DUSK_DEFAULT
 import com.example.sunrisemoonriseapp.day.Day.Companion.NIGHT_END_START_DEFAULT
 import com.example.sunrisemoonriseapp.day.Day.Companion.NIGHT_END_END_DEFAULT
 import com.example.sunrisemoonriseapp.day.DayState
+import com.example.sunrisemoonriseapp.entities.Moon
 import com.example.sunrisemoonriseapp.repository.MoonRepository
 import com.example.sunrisemoonriseapp.repository.SunRepository
-import com.example.sunrisemoonriseapp.retrofit.moon.MoonDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 
 @HiltViewModel
-class MainScreenViewModel @Inject constructor(val sunRepository: SunRepository, val moonRepository: MoonRepository) : ViewModel() {
+class MainScreenViewModel @Inject constructor(
+    val sunRepository: SunRepository,
+    val moonRepository: MoonRepository
+) : ViewModel() {
 
     lateinit var day: Day
     fun isDayInitialized() = ::day.isInitialized
@@ -39,42 +42,56 @@ class MainScreenViewModel @Inject constructor(val sunRepository: SunRepository, 
     var byTime = true
     var isRunning = true
 
+    private val formatter = SimpleDateFormat("dd.MM.yyyy", Locale.US)
+    private val formatterForSun = SimpleDateFormat("yyyy.MM.dd", Locale.US)
+    val dayInfo: MutableLiveData<Day> = MutableLiveData<Day>()
+    val moonInfo: MutableLiveData<Moon> = MutableLiveData<Moon>()
     val time: MutableLiveData<Long> by lazy {
         systemTime = System.currentTimeMillis()
         viewModelScope.launch {
-            while(true){
+            while (true) {
                 delay(1000L / timeMultiplier)
-                if(isRunning) {
+                if (isRunning) {
                     systemTime += 1000
                     time.postValue(systemTime)
 //                    Log.d("INFO", "time ${time.value}")
                 }
             }
         }
-        MutableLiveData<Long>(systemTime) }
+        MutableLiveData<Long>(systemTime)
+    }
 
-    fun getDayInfo(latitude: String, longitude: String) : LiveData<Day?> {
-        return liveData {
-            val data = sunRepository.getSunrise(latitude, longitude)
-            if(data == null){
+    fun getDayInfo(latitude: String, longitude: String) {
+        viewModelScope.launch {
+            val date =
+                if (systemTime == 0L) formatter.format(Date(System.currentTimeMillis())) else formatter.format(
+                    Date(systemTime)
+                )
+            val dateForSun =
+                if (systemTime == 0L) formatterForSun.format(Date(System.currentTimeMillis())) else formatter.format(
+                    Date(systemTime)
+                )
+            Log.d("INFO", "time on sun $date")
+            val data = sunRepository.getDay(date, dateForSun, latitude, longitude)
+            if (data == null) {
                 Log.d("INFO", "Got null data")
                 null
             }
             Log.d("INFO", "Got data")
             val values = arrayListOf(
                 NIGHT_START_START_DEFAULT,
-                if(data?.dawn != null) data.dawn.getSecondsValue() else DAWN_DEFAULT,
-                if(data?.sunrise != null) data.sunrise.getSecondsValue() else SUNRISE_DEFAULT,
-                if(data?.sunrise != null) data.sunrise.getSecondsValue() + 240 else DAY_DEFAULT,
-                if(data?.solarNoon != null) data.solarNoon.getSecondsValue() else SOLAR_NOON_DEFAULT,
-                if(data?.goldenHour != null) data.goldenHour.getSecondsValue() else GOLDEN_HOUR_DEFAULT,
-                if(data?.sunset != null) data.sunset.getSecondsValue() else SUNSET_DEFAULT,
-                if(data?.sunset != null) data.sunset.getSecondsValue() + 240 else DUSK_DEFAULT,
-                if(data?.dusk != null) data.dusk.getSecondsValue() else NIGHT_END_START_DEFAULT,
+                if (data?.dawn != null && data.dawn != "") data.dawn.getSecondsValue() else DAWN_DEFAULT,
+                if (data?.sunrise != null && data.sunrise != "") data.sunrise.getSecondsValue() else SUNRISE_DEFAULT,
+                if (data?.sunrise != null && data.sunrise != "") data.sunrise.getSecondsValue() + 240 else DAY_DEFAULT,
+                if (data?.solarNoon != null && data.solarNoon != "") data.solarNoon.getSecondsValue() else SOLAR_NOON_DEFAULT,
+                if (data?.goldenHour != null && data.goldenHour != "") data.goldenHour.getSecondsValue() else GOLDEN_HOUR_DEFAULT,
+                if (data?.sunset != null && data.sunset != "") data.sunset.getSecondsValue() else SUNSET_DEFAULT,
+                if (data?.sunset != null && data.sunset != "") data.sunset.getSecondsValue() + 240 else DUSK_DEFAULT,
+                if (data?.dusk != null && data.dusk != "") data.dusk.getSecondsValue() else NIGHT_END_START_DEFAULT,
                 NIGHT_END_END_DEFAULT
             )
             day = Day(
-                nightStart = DayState(values[0], values[1] ),
+                nightStart = DayState(values[0], values[1]),
                 dawn = DayState(values[1], values[2]),
                 sunrise = DayState(values[2], values[3]),
                 day = DayState(values[3], values[5]),
@@ -84,47 +101,54 @@ class MainScreenViewModel @Inject constructor(val sunRepository: SunRepository, 
                 dusk = DayState(values[7], values[8]),
                 nightEnd = DayState(values[8], values[9])
             )
-            emit(day)
+            Log.d("INFO", "get new day $day")
+            dayInfo.postValue(day)
         }
     }
-    fun setTime(value: Int){
+
+
+    fun setTime(value: Int) {
         systemTime = System.currentTimeMillis()
-        time.value = systemTime - (getSecondsFromToday() - value)* 1000
+        time.value = systemTime - (getSecondsFromToday() - value) * 1000
         systemTime = time.value!!
     }
-    fun resetTime(){
+
+    fun resetTime() {
         systemTime = System.currentTimeMillis()
         time.value = systemTime
     }
 
-    fun setSunrise(){
+    fun setSunrise() {
         systemTime = System.currentTimeMillis()
-        time.value = systemTime - (getSecondsFromToday() - day.sunrise.start )* 1000
+        time.value = systemTime - (getSecondsFromToday() - day.sunrise.start) * 1000
         systemTime = time.value!!
     }
 
-    fun setSunset(){
+    fun setSunset() {
         systemTime = System.currentTimeMillis()
         time.value = systemTime - (getSecondsFromToday() - day.sunset.start) * 1000
         systemTime = time.value!!
     }
-    fun setNoon(){
+
+    fun setNoon() {
         systemTime = System.currentTimeMillis()
-        time.value = systemTime - (getSecondsFromToday() - day.solarNoon.start ) * 1000
+        time.value = systemTime - (getSecondsFromToday() - day.solarNoon.start) * 1000
         systemTime = time.value!!
     }
-    fun setNight(){
+
+    fun setNight() {
         systemTime = System.currentTimeMillis()
         time.value = systemTime - getSecondsFromToday() * 1000
         systemTime = time.value!!
     }
 
-    private fun getSecondsFromToday(): Int{
+    private fun getSecondsFromToday(): Int {
         val date = Date(systemTime)
         val calendar = Calendar.getInstance()
         calendar.time = date
         return calendar.get(Calendar.HOUR_OF_DAY) * 3600 + calendar.get(Calendar.MINUTE) * 60 + calendar.get(
-            Calendar.SECOND)
+            Calendar.SECOND
+        )
     }
 
     fun setByTime(bool: Boolean, time: Long) {
@@ -136,14 +160,16 @@ class MainScreenViewModel @Inject constructor(val sunRepository: SunRepository, 
         }
     }
 
-    fun getMoonInfo(): LiveData<MoonDate>{
-        return liveData {
-            val moonDate = moonRepository.getMoon(if(systemTime == 0L) System.currentTimeMillis() / 1000  else systemTime / 1000 )
-            emit(moonDate ?: MoonDate(0, "", "", arrayListOf(""), 0, 0.0,"", 0.0F,0.0,0.0,0.0,0.0))
+    fun getMoonInfo() {
+        viewModelScope.launch {
+            val date =
+                if (systemTime == 0L) formatter.format(Date(System.currentTimeMillis())) else formatter.format(
+                    Date(systemTime)
+                )
+            Log.d("INFO", "time on moon $date")
+            val moon = moonRepository.getMoon(date)
+            moonInfo.postValue(moon ?: Moon("", "", 0, 0.0, "", 0.0F, 0.0, 0.0, 0.0, 0.0))
         }
     }
-
-
-
 
 }
