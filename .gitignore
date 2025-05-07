@@ -170,5 +170,5 @@ fabric.properties
 !/gradle/wrapper/gradle-wrapper.jar
 # End of https://www.toptal.com/developers/gitignore/api/android,kotlin,gradle,androidstudio
 # Mapkit properties
-/keystore.properties
-keystore.properties
+/app/keystore.properties
+app/keystore.properties

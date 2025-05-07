@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -6,6 +8,13 @@ plugins {
     id("kotlin-kapt")
 }
 
+fun getMapkitApiKey(): String {
+    val properties = Properties()
+    val stream = project.file("keystore.properties").inputStream()
+    properties.load(stream)
+    stream.close()
+    return properties.getProperty("MAPKIT_API_KEY", "")
+}
 
 android {
     namespace = "com.example.sunrisemoonriseapp"
@@ -13,12 +22,15 @@ android {
 
     defaultConfig {
         applicationId = "com.example.sunrisemoonriseapp"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        val mapkitApiKey = getMapkitApiKey()
+
+        buildConfigField("String", "MAPKIT_API_KEY", "\"${mapkitApiKey}\"")
     }
 
     buildTypes {
@@ -36,6 +48,9 @@ android {
     }
     kotlinOptions {
         jvmTarget = "11"
+    }
+    buildFeatures {
+        buildConfig = true
     }
 }
 
