@@ -13,7 +13,6 @@ import android.view.animation.LinearInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -29,13 +28,7 @@ import com.example.sunrisemoonriseapp.ui.AboutFragment
 import com.example.sunrisemoonriseapp.ui.CustomPainter
 import com.example.sunrisemoonriseapp.ui.MoonPainter
 import com.example.sunrisemoonriseapp.ui.PlaceFragment
-import com.google.android.material.slider.Slider
 import com.yandex.mapkit.MapKitFactory
-import com.yandex.mapkit.geometry.Point
-import com.yandex.mapkit.map.InputListener
-import com.yandex.mapkit.map.MapObjectTapListener
-import com.yandex.mapkit.mapview.MapView
-import com.yandex.runtime.image.ImageProvider
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -64,8 +57,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var x10ButtonView: TextView
     private lateinit var x100ButtonView: TextView
     private lateinit var x1000ButtonView: TextView
-    private lateinit var placeButtonView: TextView
-    private lateinit var aboutButtonView: TextView
+    private lateinit var placeButtonView: ImageView
+    private lateinit var aboutButtonView: ImageView
 
     private val viewModel by viewModels<MainScreenViewModel>()
     private val formatter = SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.US)
@@ -220,8 +213,8 @@ class MainActivity : AppCompatActivity() {
         x10ButtonView = findViewById<TextView>(R.id.x10Button)
         x100ButtonView = findViewById<TextView>(R.id.x100Button)
         x1000ButtonView = findViewById<TextView>(R.id.x1000Button)
-        placeButtonView = findViewById<TextView>(R.id.placeButton)
-        aboutButtonView = findViewById<TextView>(R.id.aboutButton)
+        placeButtonView = findViewById<ImageView>(R.id.placeButton)
+        aboutButtonView = findViewById<ImageView>(R.id.aboutButton)
         val adapter = EventAdapter(arrayListOf())
         adapter.onClickListener = EventAdapter.OnClickListener {
             Log.d("CLICK", "Item clicked {$it}")
