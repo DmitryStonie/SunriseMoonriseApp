@@ -83,15 +83,15 @@
         app:layout_constraintStart_toStartOf="@+id/ground"
         app:layout_constraintTop_toTopOf="@+id/ground" />
 
-    <com.google.android.material.slider.Slider
-        android:id="@+id/slider"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:valueFrom="0"
-        android:valueTo="86400"
-        android:layout_marginTop="50dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+<!--    <com.google.android.material.slider.Slider-->
+<!--        android:id="@+id/slider"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="50dp"-->
+<!--        android:valueFrom="0"-->
+<!--        android:valueTo="86400"-->
+<!--        android:layout_marginTop="50dp"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent" />-->
 
     <TextView
         android:id="@+id/clock"
@@ -110,12 +110,13 @@
         android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:text="Р"
+        android:layout_marginTop="40dp"
         android:textSize="36sp"
         android:textColor="@color/white"
         android:paddingHorizontal="10dp"
         android:textAlignment="center"
 
-        app:layout_constraintTop_toBottomOf="@id/slider"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         />
 
@@ -180,10 +181,12 @@
         android:layout_height="wrap_content"
         android:text="1x"
         android:textSize="30sp"
+        android:layout_marginTop="40dp"
+
         android:textColor="@color/white"
         android:paddingHorizontal="10dp"
 
-        app:layout_constraintTop_toBottomOf="@id/slider"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         />
 
@@ -238,6 +241,20 @@
 
 
         app:layout_constraintTop_toBottomOf="@id/resetButton"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/aboutButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="?"
+        android:textSize="34sp"
+        android:textColor="@color/white"
+        android:paddingHorizontal="10dp"
+
+
+        app:layout_constraintBottom_toBottomOf="@id/sky"
         app:layout_constraintStart_toStartOf="parent"
         />
 

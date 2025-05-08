@@ -25,6 +25,7 @@ import com.example.sunrisemoonriseapp.entities.Moon
 import com.example.sunrisemoonriseapp.recyclerview.DiffUtilCallback
 import com.example.sunrisemoonriseapp.recyclerview.EventAdapter
 import com.example.sunrisemoonriseapp.recyclerview.Item
+import com.example.sunrisemoonriseapp.ui.AboutFragment
 import com.example.sunrisemoonriseapp.ui.CustomPainter
 import com.example.sunrisemoonriseapp.ui.MoonPainter
 import com.example.sunrisemoonriseapp.ui.PlaceFragment
@@ -64,6 +65,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var x100ButtonView: TextView
     private lateinit var x1000ButtonView: TextView
     private lateinit var placeButtonView: TextView
+    private lateinit var aboutButtonView: TextView
 
     private val viewModel by viewModels<MainScreenViewModel>()
     private val formatter = SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.US)
@@ -219,6 +221,7 @@ class MainActivity : AppCompatActivity() {
         x100ButtonView = findViewById<TextView>(R.id.x100Button)
         x1000ButtonView = findViewById<TextView>(R.id.x1000Button)
         placeButtonView = findViewById<TextView>(R.id.placeButton)
+        aboutButtonView = findViewById<TextView>(R.id.aboutButton)
         val adapter = EventAdapter(arrayListOf())
         adapter.onClickListener = EventAdapter.OnClickListener {
             Log.d("CLICK", "Item clicked {$it}")
@@ -278,22 +281,22 @@ class MainActivity : AppCompatActivity() {
             moonViewLayout.addView(moonView)
         }
 
-        val slider = findViewById<Slider>(R.id.slider)
-        slider.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
-            override fun onStartTrackingTouch(slider: Slider) {
-                // Responds to when slider's touch event is being started
-            }
-
-            override fun onStopTrackingTouch(slider: Slider) {
-                // Responds to when slider's touch event is being stopped
-            }
-        })
-
-        slider.addOnChangeListener { slider, value, fromUser ->
-            animations.cancel()
-            viewModel.setTime(value.toInt())
-            Log.d("TIME", "Got time ${value.toInt()} ")
-        }
+//        val slider = findViewById<Slider>(R.id.slider)
+//        slider.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
+//            override fun onStartTrackingTouch(slider: Slider) {
+//                // Responds to when slider's touch event is being started
+//            }
+//
+//            override fun onStopTrackingTouch(slider: Slider) {
+//                // Responds to when slider's touch event is being stopped
+//            }
+//        })
+//
+//        slider.addOnChangeListener { slider, value, fromUser ->
+//            animations.cancel()
+//            viewModel.setTime(value.toInt())
+//            Log.d("TIME", "Got time ${value.toInt()} ")
+//        }
 
         viewModel.time.observe(this) {
             val date = Date(it)
@@ -358,6 +361,10 @@ class MainActivity : AppCompatActivity() {
         placeButtonView.setOnClickListener {
             supportFragmentManager.beginTransaction().add(R.id.scene, PlaceFragment()).addToBackStack("MAP").commit()
         }
+        aboutButtonView.setOnClickListener {
+            supportFragmentManager.beginTransaction().add(R.id.scene, AboutFragment()).addToBackStack("ABOUT").commit()
+        }
+
 
     }
 
