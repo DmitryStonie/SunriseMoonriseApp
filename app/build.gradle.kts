@@ -91,6 +91,9 @@ dependencies {
     //MapKit
     val mapkit_version = "4.15.0-lite"
     implementation("com.yandex.android:maps.mobile:$mapkit_version")
+    //fragment
+    val fragment_version = "1.8.6"
+    implementation("androidx.fragment:fragment-ktx:$fragment_version")
 }
 
 kapt {
