@@ -1,17 +1,17 @@
 package com.example.sunrisemoonriseapp.database.core
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 
 @Dao
-interface DayDao {
-
-    @Query("SELECT * FROM days WHERE date = :date")
-    fun getDayByDate(date: String): DayEntity?
+interface PlaceDao {
+    @Query("SELECT * FROM places WHERE id = :id")
+    fun getPlaceById(id: Int): PlaceEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertDay(dayEntity: DayEntity)
+    fun insertPlace(placeEntity: PlaceEntity)
 
 }

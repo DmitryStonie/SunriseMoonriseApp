@@ -17,7 +17,9 @@ import com.example.sunrisemoonriseapp.day.Day.Companion.NIGHT_END_START_DEFAULT
 import com.example.sunrisemoonriseapp.day.Day.Companion.NIGHT_END_END_DEFAULT
 import com.example.sunrisemoonriseapp.day.DayState
 import com.example.sunrisemoonriseapp.entities.Moon
+import com.example.sunrisemoonriseapp.entities.Place
 import com.example.sunrisemoonriseapp.repository.MoonRepository
+import com.example.sunrisemoonriseapp.repository.PlaceRepository
 import com.example.sunrisemoonriseapp.repository.SunRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -32,7 +34,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MainScreenViewModel @Inject constructor(
     val sunRepository: SunRepository,
-    val moonRepository: MoonRepository
+    val moonRepository: MoonRepository,
+    val placeRepository: PlaceRepository
 ) : ViewModel() {
 
     lateinit var day: Day
@@ -46,6 +49,7 @@ class MainScreenViewModel @Inject constructor(
     private val formatterForSun = SimpleDateFormat("yyyy.MM.dd", Locale.US)
     val dayInfo: MutableLiveData<Day> = MutableLiveData<Day>()
     val moonInfo: MutableLiveData<Moon> = MutableLiveData<Moon>()
+    val placeInfo: MutableLiveData<Place> = MutableLiveData<Place>()
     val time: MutableLiveData<Long> by lazy {
         systemTime = System.currentTimeMillis()
         viewModelScope.launch {
@@ -171,5 +175,35 @@ class MainScreenViewModel @Inject constructor(
             moonInfo.postValue(moon ?: Moon("", "", 0, 0.0, "", 0.0F, 0.0, 0.0, 0.0, 0.0))
         }
     }
+
+    fun getPlaceInfo() {
+        viewModelScope.launch {
+            val place = placeRepository.getPlace() ?: Place("55.0415", "82.9346")
+            placeInfo.postValue(place)
+        }
+    }
+
+    fun updatePlaceInfo(place: Place) {
+        viewModelScope.launch {
+            placeRepository.updatePlace(place)
+            launch {
+                sunRepository.updateDay(getDate(), getSunDate(), place.latitude, place.longitude)
+            }.join()
+            placeInfo.postValue(place)
+        }
+    }
+
+    private fun getDate(): String{
+        return if (systemTime == 0L) formatter.format(Date(System.currentTimeMillis())) else formatter.format(
+            Date(systemTime)
+        )
+    }
+
+    private fun getSunDate(): String{
+        return if (systemTime == 0L) formatterForSun.format(Date(System.currentTimeMillis())) else formatter.format(
+            Date(systemTime)
+        )
+    }
+
 
 }

@@ -169,3 +169,6 @@ fabric.properties
 ### AndroidStudio Patch ###
 !/gradle/wrapper/gradle-wrapper.jar
 # End of https://www.toptal.com/developers/gitignore/api/android,kotlin,gradle,androidstudio
+# Mapkit properties
+/app/keystore.properties
+app/keystore.properties

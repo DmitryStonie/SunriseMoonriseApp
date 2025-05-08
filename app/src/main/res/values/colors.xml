@@ -44,4 +44,5 @@
     <color name="ground_day">#8c3b0c</color>
     <color name="ground_night">#000B0D</color>
     <color name="cloud">#fff6f6f6</color>
+    <color name="green">#67AE6E</color>
 </resources>

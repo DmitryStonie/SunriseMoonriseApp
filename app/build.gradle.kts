@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -6,6 +8,13 @@ plugins {
     id("kotlin-kapt")
 }
 
+fun getMapkitApiKey(): String {
+    val properties = Properties()
+    val stream = project.file("keystore.properties").inputStream()
+    properties.load(stream)
+    stream.close()
+    return properties.getProperty("MAPKIT_API_KEY", "")
+}
 
 android {
     namespace = "com.example.sunrisemoonriseapp"
@@ -13,12 +22,15 @@ android {
 
     defaultConfig {
         applicationId = "com.example.sunrisemoonriseapp"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        val mapkitApiKey = getMapkitApiKey()
+
+        buildConfigField("String", "MAPKIT_API_KEY", "\"${mapkitApiKey}\"")
     }
 
     buildTypes {
@@ -36,6 +48,9 @@ android {
     }
     kotlinOptions {
         jvmTarget = "11"
+    }
+    buildFeatures {
+        buildConfig = true
     }
 }
 
@@ -73,6 +88,12 @@ dependencies {
     implementation("androidx.room:room-runtime:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
     kapt("androidx.room:room-compiler:$room_version")
+    //MapKit
+    val mapkit_version = "4.15.0-lite"
+    implementation("com.yandex.android:maps.mobile:$mapkit_version")
+    //fragment
+    val fragment_version = "1.8.6"
+    implementation("androidx.fragment:fragment-ktx:$fragment_version")
 }
 
 kapt {

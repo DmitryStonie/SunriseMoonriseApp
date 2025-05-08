@@ -13,6 +13,7 @@ import android.view.animation.LinearInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -24,9 +25,17 @@ import com.example.sunrisemoonriseapp.entities.Moon
 import com.example.sunrisemoonriseapp.recyclerview.DiffUtilCallback
 import com.example.sunrisemoonriseapp.recyclerview.EventAdapter
 import com.example.sunrisemoonriseapp.recyclerview.Item
+import com.example.sunrisemoonriseapp.ui.AboutFragment
 import com.example.sunrisemoonriseapp.ui.CustomPainter
 import com.example.sunrisemoonriseapp.ui.MoonPainter
+import com.example.sunrisemoonriseapp.ui.PlaceFragment
 import com.google.android.material.slider.Slider
+import com.yandex.mapkit.MapKitFactory
+import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.map.InputListener
+import com.yandex.mapkit.map.MapObjectTapListener
+import com.yandex.mapkit.mapview.MapView
+import com.yandex.runtime.image.ImageProvider
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -55,10 +64,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var x10ButtonView: TextView
     private lateinit var x100ButtonView: TextView
     private lateinit var x1000ButtonView: TextView
+    private lateinit var placeButtonView: TextView
+    private lateinit var aboutButtonView: TextView
 
     private val viewModel by viewModels<MainScreenViewModel>()
     private val formatter = SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.US)
     var animations = AnimatorSet()
+
 
     private val skyDawn1Color: Int by lazy {
         getColor(R.color.sky_dawn1)
@@ -187,6 +199,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d(LOG_TAG, "MainActivity successfully created $this")
         super.onCreate(savedInstanceState)
+        MapKitFactory.initialize(this)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
@@ -207,6 +220,8 @@ class MainActivity : AppCompatActivity() {
         x10ButtonView = findViewById<TextView>(R.id.x10Button)
         x100ButtonView = findViewById<TextView>(R.id.x100Button)
         x1000ButtonView = findViewById<TextView>(R.id.x1000Button)
+        placeButtonView = findViewById<TextView>(R.id.placeButton)
+        aboutButtonView = findViewById<TextView>(R.id.aboutButton)
         val adapter = EventAdapter(arrayListOf())
         adapter.onClickListener = EventAdapter.OnClickListener {
             Log.d("CLICK", "Item clicked {$it}")
@@ -214,11 +229,13 @@ class MainActivity : AppCompatActivity() {
         eventsRecyclerView.layoutManager = LinearLayoutManager(this)
         eventsRecyclerView.adapter = adapter
 
-
-        val latitude = "55.0415"
-        val longitude = "82.9346"
+        viewModel.placeInfo.observe(this) {
+            viewModel.getDayInfo(it.latitude, it.longitude)
+            Log.d("INFO", "Got place $it")
+        }
+        viewModel.getPlaceInfo()
+        viewModel.getMoonInfo()
         var curDate = -1
-        viewModel.getDayInfo(latitude, longitude)
         viewModel.dayInfo.observe(this) { day ->
             val date = Date(viewModel.time.value ?: 0)
             val calendar = Calendar.getInstance()
@@ -244,20 +261,19 @@ class MainActivity : AppCompatActivity() {
             adapter.events = events
             diffResult.dispatchUpdatesTo(adapter)
         }
-        viewModel.getMoonInfo()
-            viewModel.moonInfo.observe(this){
+        viewModel.moonInfo.observe(this) {
             Log.d("INFO", "Got moon api response $it")
             val width = abs(2 * it.illumination - 1F).toFloat()
-            val painter = if(it.age < Moon.FULL_MOON_AGE){
-                if(it.illumination <= 0.5F){
+            val painter = if (it.age < Moon.FULL_MOON_AGE) {
+                if (it.illumination <= 0.5F) {
                     MoonPainter(moonColorBright, moonColorDark, leftWidth = width)
-                } else{
+                } else {
                     MoonPainter(moonColorDark, moonColorBright, rightWidth = width)
                 }
-            } else{
-                if(it.illumination > 0.5F){
+            } else {
+                if (it.illumination > 0.5F) {
                     MoonPainter(moonColorDark, moonColorBright, leftWidth = width)
-                } else{
+                } else {
                     MoonPainter(moonColorBright, moonColorDark, rightWidth = width)
                 }
             }
@@ -265,22 +281,22 @@ class MainActivity : AppCompatActivity() {
             moonViewLayout.addView(moonView)
         }
 
-        val slider = findViewById<Slider>(R.id.slider)
-        slider.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
-            override fun onStartTrackingTouch(slider: Slider) {
-                // Responds to when slider's touch event is being started
-            }
-
-            override fun onStopTrackingTouch(slider: Slider) {
-                // Responds to when slider's touch event is being stopped
-            }
-        })
-
-        slider.addOnChangeListener { slider, value, fromUser ->
-            animations.cancel()
-            viewModel.setTime(value.toInt())
-            Log.d("TIME", "Got time ${value.toInt()} ")
-        }
+//        val slider = findViewById<Slider>(R.id.slider)
+//        slider.addOnSliderTouchListener(object : Slider.OnSliderTouchListener {
+//            override fun onStartTrackingTouch(slider: Slider) {
+//                // Responds to when slider's touch event is being started
+//            }
+//
+//            override fun onStopTrackingTouch(slider: Slider) {
+//                // Responds to when slider's touch event is being stopped
+//            }
+//        })
+//
+//        slider.addOnChangeListener { slider, value, fromUser ->
+//            animations.cancel()
+//            viewModel.setTime(value.toInt())
+//            Log.d("TIME", "Got time ${value.toInt()} ")
+//        }
 
         viewModel.time.observe(this) {
             val date = Date(it)
@@ -292,15 +308,15 @@ class MainActivity : AppCompatActivity() {
                 calendar.get(Calendar.HOUR_OF_DAY) * 3600 + calendar.get(Calendar.MINUTE) * 60 + calendar.get(
                     Calendar.SECOND
                 ),
-                if(viewModel.byTime){
+                if (viewModel.byTime) {
                     1000L / viewModel.timeMultiplier
                 } else {
-                    viewModel.setByTime(true,ANIM_DURATION)
+                    viewModel.setByTime(true, ANIM_DURATION)
                     ANIM_DURATION
                 }
             )
-            if(calendar.get(Calendar.DATE) > curDate && curDate != -1){
-                viewModel.getDayInfo(latitude, longitude)
+            if (calendar.get(Calendar.DATE) > curDate && curDate != -1) {
+                viewModel.getDayInfo(viewModel.placeInfo.value!!.latitude, viewModel.placeInfo.value!!.longitude)
                 viewModel.getMoonInfo()
                 curDate = calendar.get(Calendar.DATE)
             }
@@ -342,9 +358,16 @@ class MainActivity : AppCompatActivity() {
         x1000ButtonView.setOnClickListener {
             viewModel.timeMultiplier = 1000
         }
+        placeButtonView.setOnClickListener {
+            supportFragmentManager.beginTransaction().add(R.id.scene, PlaceFragment()).addToBackStack("MAP").commit()
+        }
+        aboutButtonView.setOnClickListener {
+            supportFragmentManager.beginTransaction().add(R.id.scene, AboutFragment()).addToBackStack("ABOUT").commit()
+        }
 
 
     }
+
 
     private fun updateAnimations(time: Int, duration: Long) {
         if (!viewModel.isDayInitialized() || animations.isRunning) {
