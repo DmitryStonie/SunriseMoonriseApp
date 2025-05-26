@@ -7,15 +7,18 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.annotation.MenuRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -52,17 +55,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var sceneView: View
     private lateinit var eventsRecyclerView: RecyclerView
     private lateinit var clockView: TextView
-    private lateinit var sunriseButtonView: TextView
-    private lateinit var sunsetButtonView: TextView
-    private lateinit var noonButtonView: TextView
-    private lateinit var nightButtonView: TextView
     private lateinit var resetButtonView: ImageView
-    private lateinit var x1ButtonView: TextView
-    private lateinit var x10ButtonView: TextView
-    private lateinit var x100ButtonView: TextView
-    private lateinit var x1000ButtonView: TextView
     private lateinit var placeButtonView: ImageView
     private lateinit var aboutButtonView: ImageView
+    private lateinit var menuButtonView: ImageView
 
     private val viewModel by viewModels<MainScreenViewModel>()
     private val formatter = SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.US)
@@ -208,17 +204,10 @@ class MainActivity : AppCompatActivity() {
         sceneView = findViewById(R.id.scene)
         eventsRecyclerView = findViewById(R.id.eventsRecyclerView)
         clockView = findViewById<TextView>(R.id.clock)
-        sunriseButtonView = findViewById<TextView>(R.id.sunriseButton)
-        sunsetButtonView = findViewById<TextView>(R.id.sunsetButton)
-        noonButtonView = findViewById<TextView>(R.id.noonButton)
-        nightButtonView = findViewById<TextView>(R.id.nightButton)
         resetButtonView = findViewById<ImageView>(R.id.resetButton)
-        x1ButtonView = findViewById<TextView>(R.id.x1Button)
-        x10ButtonView = findViewById<TextView>(R.id.x10Button)
-        x100ButtonView = findViewById<TextView>(R.id.x100Button)
-        x1000ButtonView = findViewById<TextView>(R.id.x1000Button)
         placeButtonView = findViewById<ImageView>(R.id.placeButton)
         aboutButtonView = findViewById<ImageView>(R.id.aboutButton)
+        menuButtonView = findViewById<ImageView>(R.id.menuButton)
         val adapter = EventAdapter(arrayListOf())
         adapter.onClickListener = EventAdapter.OnClickListener {
             Log.d("CLICK", "Item clicked {$it}")
@@ -245,8 +234,7 @@ class MainActivity : AppCompatActivity() {
                 Log.d("TIME", day.toString())
                 events.add(
                     Item(
-                        "Длина дня",
-                        (day.sunset.start - day.sunrise.start).getTimeValue()
+                        "Длина дня", (day.sunset.start - day.sunrise.start).getTimeValue()
                     )
                 )
                 events.add(Item("Рассвет", day.sunrise.start.getTimeValue()))
@@ -304,8 +292,7 @@ class MainActivity : AppCompatActivity() {
             updateAnimations(
                 calendar.get(Calendar.HOUR_OF_DAY) * 3600 + calendar.get(Calendar.MINUTE) * 60 + calendar.get(
                     Calendar.SECOND
-                ),
-                if (viewModel.byTime) {
+                ), if (viewModel.byTime) {
                     1000L / viewModel.timeMultiplier
                 } else {
                     viewModel.setByTime(true, ANIM_DURATION)
@@ -313,53 +300,28 @@ class MainActivity : AppCompatActivity() {
                 }
             )
             if (calendar.get(Calendar.DATE) > curDate && curDate != -1) {
-                viewModel.getDayInfo(viewModel.placeInfo.value!!.latitude, viewModel.placeInfo.value!!.longitude)
+                viewModel.getDayInfo(
+                    viewModel.placeInfo.value!!.latitude, viewModel.placeInfo.value!!.longitude
+                )
                 viewModel.getMoonInfo()
                 curDate = calendar.get(Calendar.DATE)
             }
-        }
-        sunriseButtonView.setOnClickListener {
-            animations.cancel()
-            viewModel.byTime = false
-            viewModel.setSunrise()
-        }
-        sunsetButtonView.setOnClickListener {
-            animations.cancel()
-            viewModel.byTime = false
-            viewModel.setSunset()
-        }
-        noonButtonView.setOnClickListener {
-            animations.cancel()
-            viewModel.byTime = false
-            viewModel.setNoon()
-        }
-        nightButtonView.setOnClickListener {
-            animations.cancel()
-            viewModel.byTime = false
-            viewModel.setNight()
         }
         resetButtonView.setOnClickListener {
             animations.cancel()
             viewModel.byTime = false
             viewModel.resetTime()
         }
-        x1ButtonView.setOnClickListener {
-            viewModel.timeMultiplier = 1
-        }
-        x10ButtonView.setOnClickListener {
-            viewModel.timeMultiplier = 10
-        }
-        x100ButtonView.setOnClickListener {
-            viewModel.timeMultiplier = 100
-        }
-        x1000ButtonView.setOnClickListener {
-            viewModel.timeMultiplier = 1000
-        }
         placeButtonView.setOnClickListener {
-            supportFragmentManager.beginTransaction().add(R.id.scene, PlaceFragment()).addToBackStack("MAP").commit()
+            supportFragmentManager.beginTransaction().add(R.id.scene, PlaceFragment())
+                .addToBackStack("MAP").commit()
         }
         aboutButtonView.setOnClickListener {
-            supportFragmentManager.beginTransaction().add(R.id.scene, AboutFragment()).addToBackStack("ABOUT").commit()
+            supportFragmentManager.beginTransaction().add(R.id.scene, AboutFragment())
+                .addToBackStack("ABOUT").commit()
+        }
+        menuButtonView.setOnClickListener { v: View ->
+            showMenu(v, R.menu.popup_menu)
         }
 
         ViewCompat.setOnApplyWindowInsetsListener(sceneView) { v, windowInsets ->
@@ -373,7 +335,6 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
-
 
     private fun updateAnimations(time: Int, duration: Long) {
         if (!viewModel.isDayInitialized() || animations.isRunning) {
@@ -397,16 +358,10 @@ class MainActivity : AppCompatActivity() {
 //                duration
 //            ),
             getNewSkyColor(
-                viewModel.day,
-                time,
-                (skyView.background as ColorDrawable).color,
-                duration
+                viewModel.day, time, (skyView.background as ColorDrawable).color, duration
             ),
             getNewGroundColor(
-                viewModel.day,
-                time,
-                (groundView.background as ColorDrawable).color,
-                duration
+                viewModel.day, time, (groundView.background as ColorDrawable).color, duration
             )
         )
         animations.start()
@@ -416,39 +371,27 @@ class MainActivity : AppCompatActivity() {
     private fun getSunPosition(day: Day, time: Int): Float {
         return if (time >= day.dawn.start && time < day.dawn.end) {
             return sceneView.height.toFloat() - getAnimProgress(
-                day.dawn.start,
-                day.dawn.end,
-                time
+                day.dawn.start, day.dawn.end, time
             ) * groundView.height.toFloat()
         } else if (time >= day.sunrise.start && time < day.sunrise.end) {
             return sceneView.height.toFloat() - groundView.height.toFloat() - getAnimProgress(
-                day.sunrise.start,
-                day.sunrise.end,
-                time
+                day.sunrise.start, day.sunrise.end, time
             ) * sunView.height.toFloat()
         } else if (time >= day.day.start && time < day.solarNoon.start) {
             return skyView.height.toFloat() - sunView.height.toFloat() - getAnimProgress(
-                day.day.start,
-                day.solarNoon.start,
-                time
+                day.day.start, day.solarNoon.start, time
             ) * 0.75F * (skyView.height.toFloat() - sunView.height.toFloat())
         } else if (time >= day.solarNoon.end && time < day.goldenHour.end) {
             return 0.25F * (skyView.height.toFloat() - sunView.height.toFloat()) + getAnimProgress(
-                day.solarNoon.end,
-                day.goldenHour.end,
-                time
+                day.solarNoon.end, day.goldenHour.end, time
             ) * 0.75F * (skyView.height.toFloat() - sunView.height.toFloat())
         } else if (time >= day.sunset.start && time < day.sunset.end) {
             return (skyView.height.toFloat() - sunView.height.toFloat()) + getAnimProgress(
-                day.sunset.start,
-                day.sunset.end,
-                time
+                day.sunset.start, day.sunset.end, time
             ) * sunView.height.toFloat()
         } else if (time >= day.dusk.start && time < day.dusk.end) {
             return skyView.height.toFloat() + getAnimProgress(
-                day.dusk.start,
-                day.dusk.end,
-                time
+                day.dusk.start, day.dusk.end, time
             ) * groundView.height.toFloat()
         } else {
             return sceneView.height.toFloat()
@@ -458,15 +401,11 @@ class MainActivity : AppCompatActivity() {
     private fun getMoonPosition(day: Day, time: Int): Float {
         return if (time >= day.dusk.start && time <= day.nightEnd.end) {
             return skyView.height.toFloat() - getAnimProgress(
-                day.dusk.start,
-                day.nightEnd.end,
-                time
+                day.dusk.start, day.nightEnd.end, time
             ) * 0.8F * skyView.height.toFloat()
         } else if (time >= day.nightStart.start && time <= day.dawn.end) {
             return 0.2F * skyView.height.toFloat() + getAnimProgress(
-                day.nightStart.start,
-                day.dawn.end,
-                time
+                day.nightStart.start, day.dawn.end, time
             ) * 0.8F * skyView.height.toFloat()
         } else {
             return return sceneView.height.toFloat()
@@ -474,15 +413,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun getMovementAnimator(
-        view: View,
-        startPos: Float,
-        endPos: Float,
-        dur: Long = ANIM_DURATION
+        view: View, startPos: Float, endPos: Float, dur: Long = ANIM_DURATION
     ): ValueAnimator {
         return ValueAnimator.ofFloat(
             startPos, endPos
-        )
-            .apply {
+        ).apply {
                 interpolator = AccelerateInterpolator()
                 duration = dur
                 addUpdateListener { animator ->
@@ -492,15 +427,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getViewColorAnimator(
-        view: View,
-        startColor: Int,
-        endColor: Int,
-        dur: Long = ANIM_DURATION
+        view: View, startColor: Int, endColor: Int, dur: Long = ANIM_DURATION
     ): ValueAnimator {
         return ValueAnimator.ofObject(
-            ArgbEvaluator(),
-            startColor,
-            endColor
+            ArgbEvaluator(), startColor, endColor
         ).apply {
             duration = dur
             addUpdateListener { animator ->
@@ -512,15 +442,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getDrawableColorAnimator(
-        view: View,
-        startColor: Int,
-        endColor: Int,
-        animDuration: Long = ANIM_DURATION
+        view: View, startColor: Int, endColor: Int, animDuration: Long = ANIM_DURATION
     ): ValueAnimator {
         return ValueAnimator.ofObject(
-            ArgbEvaluator(),
-            startColor,
-            endColor
+            ArgbEvaluator(), startColor, endColor
         ).apply {
             duration = animDuration
             addUpdateListener { animator ->
@@ -535,8 +460,7 @@ class MainActivity : AppCompatActivity() {
     ): ValueAnimator {
         return ValueAnimator.ofFloat(
             -cloudView.width.toFloat(), sceneView.width.toFloat()
-        )
-            .apply {
+        ).apply {
                 interpolator = LinearInterpolator()
                 duration = 2000
                 addUpdateListener { animator ->
@@ -593,9 +517,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getMoonColor(day: Day, time: Int): Int {
-        return if ((time >= day.nightStart.start && time < day.nightStart.end)
-            || (time >= day.nightEnd.start && time < day.nightEnd.end)
-        ) {
+        return if ((time >= day.nightStart.start && time < day.nightStart.end) || (time >= day.nightEnd.start && time < day.nightEnd.end)) {
             moonColorBright
         } else {
             moonColor
@@ -603,9 +525,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getGroundColor(day: Day, time: Int): Int {
-        return if ((time >= day.nightStart.start && time < day.nightStart.end)
-            || (time >= day.nightEnd.start && time < day.nightEnd.end)
-        ) {
+        return if ((time >= day.nightStart.start && time < day.nightStart.end) || (time >= day.nightEnd.start && time < day.nightEnd.end)) {
             groundColorNight
         } else {
             groundColor
@@ -713,87 +633,108 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getNewMoon(
-        day: Day,
-        time: Int,
-        currentPos: Float,
-        duration: Long
+        day: Day, time: Int, currentPos: Float, duration: Long
     ): ValueAnimator? {
         return getMovementAnimator(
-            moonViewLayout,
-            currentPos,
-            getMoonPosition(day, time),
-            duration
+            moonViewLayout, currentPos, getMoonPosition(day, time), duration
         )
     }
 
     private fun getNewSun(
-        day: Day,
-        time: Int,
-        currentPos: Float,
-        duration: Long
+        day: Day, time: Int, currentPos: Float, duration: Long
     ): ValueAnimator? {
         return getMovementAnimator(
-            sunView,
-            currentPos,
-            getSunPosition(day, time),
-            duration
+            sunView, currentPos, getSunPosition(day, time), duration
         )
     }
 
     private fun getNewSunColor(
-        day: Day,
-        time: Int,
-        currentColor: Int,
-        duration: Long
+        day: Day, time: Int, currentColor: Int, duration: Long
     ): ValueAnimator? {
         return getDrawableColorAnimator(
-            sunView,
-            currentColor,
-            getSunColor(day, time),
-            duration
+            sunView, currentColor, getSunColor(day, time), duration
         )
     }
 
     private fun getNewMoonColor(
-        day: Day,
-        time: Int,
-        currentColor: Int,
-        duration: Long
+        day: Day, time: Int, currentColor: Int, duration: Long
     ): ValueAnimator? {
         return getDrawableColorAnimator(
-            moonView,
-            currentColor,
-            getMoonColor(day, time),
-            duration
+            moonView, currentColor, getMoonColor(day, time), duration
         )
     }
 
     private fun getNewSkyColor(
-        day: Day,
-        time: Int,
-        currentColor: Int,
-        duration: Long
+        day: Day, time: Int, currentColor: Int, duration: Long
     ): ValueAnimator? {
         return getViewColorAnimator(
-            skyView,
-            currentColor,
-            getSkyColor(day, time),
-            duration
+            skyView, currentColor, getSkyColor(day, time), duration
         )
     }
 
     private fun getNewGroundColor(
-        day: Day,
-        time: Int,
-        currentColor: Int,
-        duration: Long
+        day: Day, time: Int, currentColor: Int, duration: Long
     ): ValueAnimator? {
         return getViewColorAnimator(
-            groundView,
-            currentColor,
-            getGroundColor(day, time),
-            duration
+            groundView, currentColor, getGroundColor(day, time), duration
         )
+    }
+
+    private fun showMenu(v: View, @MenuRes menuRes: Int) {
+        val popup = PopupMenu(this, v)
+        popup.menuInflater.inflate(menuRes, popup.menu)
+
+        popup.setOnMenuItemClickListener { menuItem: MenuItem ->
+            when (menuItem.itemId) {
+                R.id.sunrise_phase_option -> {
+                    animations.cancel()
+                    viewModel.byTime = false
+                    viewModel.setSunrise()
+                }
+
+                R.id.noon_phase_option -> {
+                    animations.cancel()
+                    viewModel.byTime = false
+                    viewModel.setNoon()
+                }
+
+                R.id.sunset_phase_option -> {
+                    animations.cancel()
+                    viewModel.byTime = false
+                    viewModel.setSunset()
+                }
+
+                R.id.night_phase_option -> {
+                    animations.cancel()
+                    viewModel.byTime = false
+                    viewModel.setNight()
+                }
+
+                R.id.x1_speed_up_option -> {
+                    viewModel.timeMultiplier = 1
+                }
+
+                R.id.x10_speed_up_option -> {
+                    viewModel.timeMultiplier = 10
+                }
+
+                R.id.x100_speed_up_option -> {
+                    viewModel.timeMultiplier = 100
+                }
+
+                R.id.x1000_speed_up_option -> {
+                    viewModel.timeMultiplier = 1000
+                }
+
+                else -> {}
+            }
+            true
+        }
+        popup.setOnDismissListener {
+            // Respond to popup being dismissed.
+        }
+        // Show the popup menu.
+        popup.show()
     }
 
     companion object {
