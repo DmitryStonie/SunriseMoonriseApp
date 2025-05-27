@@ -94,6 +94,9 @@ dependencies {
     //fragment
     val fragment_version = "1.8.6"
     implementation("androidx.fragment:fragment-ktx:$fragment_version")
+    //lifecycle ktx
+    val lifecycle_ktx_version = "2.8.7"
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_ktx_version")
 }
 
 kapt {

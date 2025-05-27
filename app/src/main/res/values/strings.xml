@@ -2,6 +2,11 @@
     <string name="app_name">Sunrise App</string>
     <string name="menu_day_phase_option_title">Фаза дня</string>
     <string name="menu_speed_up_option_title">Ускорение времени</string>
+    <string name="sunrise_title">Рассвет</string>
+    <string name="noon_title">Полдень</string>
+    <string name="sunset_title">Закат</string>
+    <string name="night_title">Полночь</string>
+    <string name="day_length_title">Длина дня</string>
     <string name="menu_sunrise_option_text">Рассвет</string>
     <string name="menu_noon_option_text">Полдень</string>
     <string name="menu_sunset_option_text">Закат</string>

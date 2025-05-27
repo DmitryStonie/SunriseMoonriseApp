@@ -1,8 +1,9 @@
 package com.example.sunrisemoonriseapp.recyclerview
 
 import androidx.recyclerview.widget.DiffUtil
+import com.example.sunrisemoonriseapp.recyclerview.items.BaseItem
 
-class DiffUtilCallback(private val oldItems: List<Item>, private val newItems: List<Item>): DiffUtil.Callback() {
+class DiffUtilCallback(private val oldItems: List<BaseItem>, private val newItems: List<BaseItem>): DiffUtil.Callback() {
     override fun getOldListSize(): Int = oldItems.size
 
     override fun getNewListSize(): Int = newItems.size
@@ -11,13 +12,13 @@ class DiffUtilCallback(private val oldItems: List<Item>, private val newItems: L
         oldItemPosition: Int,
         newItemPosition: Int
     ): Boolean {
-        return oldItems[oldItemPosition].title == newItems[newItemPosition].title
+        return oldItems[oldItemPosition].type == newItems[newItemPosition].type
     }
 
     override fun areContentsTheSame(
         oldItemPosition: Int,
         newItemPosition: Int
     ): Boolean {
-        return oldItems[oldItemPosition].text == newItems[newItemPosition].text
+        return oldItems[oldItemPosition] == newItems[newItemPosition]
     }
 }
