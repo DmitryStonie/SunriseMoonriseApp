@@ -202,7 +202,7 @@ class SkyViewHolder(val view: View) : BaseViewHolder(view) {
                 calendar.get(Calendar.HOUR_OF_DAY) * 3600 + calendar.get(Calendar.MINUTE) * 60 + calendar.get(
                     Calendar.SECOND
                 ),
-                ANIM_DURATION, item.dayLiveData.value
+                item.animDurationLiveData.value ?: ANIM_DURATION, item.dayLiveData.value
             )
         }
         resetButtonView.setOnClickListener {

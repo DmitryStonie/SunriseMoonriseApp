@@ -72,11 +72,11 @@ class MainActivity : AppCompatActivity() {
                         Log.d("INFO", "clicl")
                     },
                     {
-                        supportFragmentManager.beginTransaction().add(R.id.scene, PlaceFragment())
+                        supportFragmentManager.beginTransaction().add(R.id.mainView, PlaceFragment())
                             .addToBackStack("MAP").commit()
                     },
                     {
-                        supportFragmentManager.beginTransaction().add(R.id.scene, AboutFragment())
+                        supportFragmentManager.beginTransaction().add(R.id.mainView, AboutFragment())
                             .addToBackStack("ABOUT").commit()
                     },
                     {
@@ -101,7 +101,8 @@ class MainActivity : AppCompatActivity() {
                     { viewModel.timeMultiplier = 1000 },
                     viewModel.time,
                     viewModel.dayInfo,
-                    viewModel.moonInfo
+                    viewModel.moonInfo,
+                    viewModel.animDuration
                 ), DayInfoItem(viewModel.dayInfo)
             )
         )

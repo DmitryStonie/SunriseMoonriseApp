@@ -18,6 +18,7 @@ import com.example.sunrisemoonriseapp.day.Day.Companion.NIGHT_END_END_DEFAULT
 import com.example.sunrisemoonriseapp.day.DayState
 import com.example.sunrisemoonriseapp.entities.Moon
 import com.example.sunrisemoonriseapp.entities.Place
+import com.example.sunrisemoonriseapp.recyclerview.viewholders.SkyViewHolder.Companion.ANIM_DURATION
 import com.example.sunrisemoonriseapp.repository.MoonRepository
 import com.example.sunrisemoonriseapp.repository.PlaceRepository
 import com.example.sunrisemoonriseapp.repository.SunRepository
@@ -50,6 +51,7 @@ class MainScreenViewModel @Inject constructor(
     val dayInfo: MutableLiveData<Day> = MutableLiveData<Day>()
     val moonInfo: MutableLiveData<Moon> = MutableLiveData<Moon>()
     val placeInfo: MutableLiveData<Place> = MutableLiveData<Place>()
+    val animDuration: MutableLiveData<Long> = MutableLiveData<Long>()
     val time: MutableLiveData<Long> by lazy {
         systemTime = System.currentTimeMillis()
         viewModelScope.launch {
@@ -57,6 +59,12 @@ class MainScreenViewModel @Inject constructor(
                 delay(1000L / timeMultiplier)
                 if (isRunning) {
                     systemTime += 1000
+                    if (byTime) {
+                        animDuration.postValue(1000L / timeMultiplier)
+                    } else {
+                        setByTime(true, ANIM_DURATION)
+                        animDuration.postValue(ANIM_DURATION)
+                    }
                     time.postValue(systemTime)
 //                    Log.d("INFO", "time ${time.value}")
                 }

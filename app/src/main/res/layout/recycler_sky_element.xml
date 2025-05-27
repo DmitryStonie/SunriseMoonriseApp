@@ -5,13 +5,12 @@
     android:id="@+id/scene"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
     >
 
     <FrameLayout
         android:id="@+id/sky"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         android:background="@color/sky_day1"
         app:layout_constraintBottom_toTopOf="@id/ground"
         app:layout_constraintEnd_toEndOf="parent"
@@ -38,7 +37,7 @@
         android:id="@+id/moon"
         android:layout_width="90dp"
         android:layout_height="90dp"
-        app:layout_constraintBottom_toBottomOf="@id/ground"
+        app:layout_constraintTop_toTopOf="@id/ground"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 

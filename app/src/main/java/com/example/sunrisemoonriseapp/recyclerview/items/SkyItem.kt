@@ -19,6 +19,7 @@ class SkyItem(
     val timeLiveData: MutableLiveData<Long>,
     val dayLiveData: MutableLiveData<Day>,
     val moonLiveData: MutableLiveData<Moon>,
+    val animDurationLiveData: MutableLiveData<Long>
 ) : BaseItem {
     override val type: Int
         get() = BaseItem.Type.SkyItem.value
