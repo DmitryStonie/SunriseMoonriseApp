@@ -4,7 +4,6 @@ import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.findViewTreeLifecycleOwner
 import com.example.sunrisemoonriseapp.R
 import com.example.sunrisemoonriseapp.getTimeValue
 import com.example.sunrisemoonriseapp.recyclerview.items.DayInfoItem

@@ -14,7 +14,8 @@ class LocalPlaceDataSource @Inject constructor(val placeDao: PlaceDao) {
             return@withContext if (entity == null) null else
                 Place(
                     entity.latitude,
-                    entity.longitude
+                    entity.longitude,
+                    entity.name
                 )
         }
     }
@@ -23,7 +24,7 @@ class LocalPlaceDataSource @Inject constructor(val placeDao: PlaceDao) {
             placeDao.insertPlace(
                 PlaceEntity(
                     0,
-                    "",
+                    place.name,
                     place.latitude,
                     place.longitude
                 )

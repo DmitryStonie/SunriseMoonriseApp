@@ -1,50 +1,28 @@
 package com.example.sunrisemoonriseapp
 
-import android.animation.AnimatorSet
-import android.animation.ArgbEvaluator
-import android.animation.ValueAnimator
-import android.graphics.drawable.ColorDrawable
-import android.graphics.drawable.GradientDrawable
+
 import android.os.Bundle
 import android.util.Log
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
-import android.view.animation.AccelerateInterpolator
-import android.view.animation.LinearInterpolator
-import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.PopupMenu
-import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.annotation.MenuRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.sunrisemoonriseapp.day.Day
-import com.example.sunrisemoonriseapp.entities.Moon
-import com.example.sunrisemoonriseapp.recyclerview.DiffUtilCallback
 import com.example.sunrisemoonriseapp.recyclerview.RecyclerAdapter
-import com.example.sunrisemoonriseapp.recyclerview.items.BaseItem
 import com.example.sunrisemoonriseapp.recyclerview.items.DayInfoItem
 import com.example.sunrisemoonriseapp.recyclerview.items.SkyItem
-import com.example.sunrisemoonriseapp.recyclerview.viewholders.SkyViewHolder.Companion.ANIM_DURATION
 import com.example.sunrisemoonriseapp.ui.AboutFragment
-import com.example.sunrisemoonriseapp.ui.CustomPainter
-import com.example.sunrisemoonriseapp.ui.MoonPainter
 import com.example.sunrisemoonriseapp.ui.PlaceFragment
 import com.yandex.mapkit.MapKitFactory
 import dagger.hilt.android.AndroidEntryPoint
-import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-import kotlin.math.abs
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -102,7 +80,8 @@ class MainActivity : AppCompatActivity() {
                     viewModel.time,
                     viewModel.dayInfo,
                     viewModel.moonInfo,
-                    viewModel.animDuration
+                    viewModel.animDuration,
+                    viewModel.placeInfo
                 ), DayInfoItem(viewModel.dayInfo)
             )
         )

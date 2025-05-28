@@ -24,9 +24,8 @@ import com.example.sunrisemoonriseapp.ui.MoonPainter
 import java.util.Calendar
 import kotlin.math.abs
 import android.util.Log
-import androidx.lifecycle.Lifecycle
+import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.findViewTreeLifecycleOwner
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -170,6 +169,7 @@ class SkyViewHolder(val view: View) : BaseViewHolder(view) {
     val placeButtonView: ImageView = view.findViewById<ImageView>(R.id.placeButton)
     val aboutButtonView: ImageView = view.findViewById<ImageView>(R.id.aboutButton)
     val menuButtonView: ImageView = view.findViewById<ImageView>(R.id.menuButton)
+    val placeNameView: TextView = view.findViewById<TextView>(R.id.placeName)
 
 
     fun bind(item: SkyItem) {
@@ -204,6 +204,14 @@ class SkyViewHolder(val view: View) : BaseViewHolder(view) {
                 ),
                 item.animDurationLiveData.value ?: ANIM_DURATION, item.dayLiveData.value
             )
+        }
+        item.placeLiveData.observe(view.context as LifecycleOwner) { place ->
+            if (place.name == "") {
+                placeNameView.isVisible = false
+            } else {
+                placeNameView.isVisible = true
+                placeNameView.text = place.name
+            }
         }
         resetButtonView.setOnClickListener {
             animations.cancel()

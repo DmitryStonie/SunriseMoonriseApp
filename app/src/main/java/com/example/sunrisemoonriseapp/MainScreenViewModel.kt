@@ -40,7 +40,6 @@ class MainScreenViewModel @Inject constructor(
 ) : ViewModel() {
 
     lateinit var day: Day
-    fun isDayInitialized() = ::day.isInitialized
     private var systemTime = 0L
     var timeMultiplier = 1
     var byTime = true
@@ -186,18 +185,31 @@ class MainScreenViewModel @Inject constructor(
 
     fun getPlaceInfo() {
         viewModelScope.launch {
-            val place = placeRepository.getPlace() ?: Place("55.0415", "82.9346")
+            val place = placeRepository.getLocalPlace() ?: Place("55.0415", "82.9346", "Новосибирск")
             placeInfo.postValue(place)
         }
     }
 
-    fun updatePlaceInfo(place: Place) {
+    fun savePlaceInfo() {
+        if(placeInfo.value != null) {
+            viewModelScope.launch {
+                placeRepository.updatePlace(placeInfo.value!!)
+                launch {
+                    sunRepository.updateDay(
+                        getDate(),
+                        getSunDate(),
+                        placeInfo.value!!.latitude,
+                        placeInfo.value!!.longitude
+                    )
+                }.join()
+            }
+        }
+    }
+
+    fun getPlaceName(latitude: String, longitude: String){
         viewModelScope.launch {
-            placeRepository.updatePlace(place)
-            launch {
-                sunRepository.updateDay(getDate(), getSunDate(), place.latitude, place.longitude)
-            }.join()
-            placeInfo.postValue(place)
+            val name = placeRepository.getPlaceName(Place(latitude, longitude, ""))
+            placeInfo.postValue(Place(latitude,longitude, name ?: ""))
         }
     }
 

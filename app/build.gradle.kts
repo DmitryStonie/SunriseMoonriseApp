@@ -16,6 +16,14 @@ fun getMapkitApiKey(): String {
     return properties.getProperty("MAPKIT_API_KEY", "")
 }
 
+fun getGeocoderApiKey(): String {
+    val properties = Properties()
+    val stream = project.file("keystore.properties").inputStream()
+    properties.load(stream)
+    stream.close()
+    return properties.getProperty("GEOCODER_API_KEY", "")
+}
+
 android {
     namespace = "com.example.sunrisemoonriseapp"
     compileSdk = 35
@@ -29,8 +37,10 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         val mapkitApiKey = getMapkitApiKey()
+        val geocoderApiKey = getGeocoderApiKey()
 
         buildConfigField("String", "MAPKIT_API_KEY", "\"${mapkitApiKey}\"")
+        buildConfigField("String", "GEOCODER_API_KEY", "\"${geocoderApiKey}\"")
     }
 
     buildTypes {
