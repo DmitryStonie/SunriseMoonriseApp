@@ -1,8 +1,5 @@
 package com.example.sunrisemoonriseapp.entities
 
-import android.health.connect.datatypes.units.Temperature
-import android.opengl.Visibility
-
 data class Weather(
     val date: String,
     val name: String,

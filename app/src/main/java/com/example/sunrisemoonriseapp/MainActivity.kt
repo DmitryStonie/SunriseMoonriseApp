@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.sunrisemoonriseapp.recyclerview.RecyclerAdapter
 import com.example.sunrisemoonriseapp.recyclerview.items.DayInfoItem
 import com.example.sunrisemoonriseapp.recyclerview.items.SkyItem
+import com.example.sunrisemoonriseapp.recyclerview.items.WeatherInfoItem
 import com.example.sunrisemoonriseapp.ui.AboutFragment
 import com.example.sunrisemoonriseapp.ui.PlaceFragment
 import com.yandex.mapkit.MapKitFactory
@@ -83,7 +84,8 @@ class MainActivity : AppCompatActivity() {
                     viewModel.animDuration,
                     viewModel.placeInfo,
                     viewModel.weatherInfo
-                ), DayInfoItem(viewModel.dayInfo)
+                ), WeatherInfoItem(viewModel.weatherInfo),
+                DayInfoItem(viewModel.dayInfo, viewModel.weatherInfo)
             )
         )
         eventsRecyclerView.layoutManager = LinearLayoutManager(this)

@@ -10,9 +10,11 @@ import com.example.sunrisemoonriseapp.R
 import com.example.sunrisemoonriseapp.recyclerview.items.BaseItem
 import com.example.sunrisemoonriseapp.recyclerview.items.DayInfoItem
 import com.example.sunrisemoonriseapp.recyclerview.items.SkyItem
+import com.example.sunrisemoonriseapp.recyclerview.items.WeatherInfoItem
 import com.example.sunrisemoonriseapp.recyclerview.viewholders.BaseViewHolder
 import com.example.sunrisemoonriseapp.recyclerview.viewholders.DayInfoViewHolder
 import com.example.sunrisemoonriseapp.recyclerview.viewholders.SkyViewHolder
+import com.example.sunrisemoonriseapp.recyclerview.viewholders.WeatherInfoViewHolder
 
 class RecyclerAdapter(var items: List<BaseItem>) : RecyclerView.Adapter<BaseViewHolder>() {
 
@@ -25,15 +27,20 @@ class RecyclerAdapter(var items: List<BaseItem>) : RecyclerView.Adapter<BaseView
                 val view = LayoutInflater.from(parent.context).inflate(R.layout.recycler_sky_element, parent, false)
                 val holder = SkyViewHolder(view)
                 val params = holder.view.findViewById<ConstraintLayout>(R.id.scene).layoutParams as RecyclerView.LayoutParams
-                params.height = (parent.height / 5 * 4)
+                params.height = (parent.height * 0.87).toInt()
                 holder.view.layoutParams = params
                 holder
             }
             BaseItem.Type.DayInfoItem.value -> {
                 val view = LayoutInflater.from(parent.context).inflate(R.layout.recycler_ground_day_info_element, parent, false)
                 val holder = DayInfoViewHolder(view)
+                holder
+            }
+            BaseItem.Type.WeatherInfoItem.value -> {
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.recycler_weather_info_element, parent, false)
+                val holder = WeatherInfoViewHolder(view)
                 val params = holder.view.findViewById<ConstraintLayout>(R.id.element).layoutParams as RecyclerView.LayoutParams
-                params.height = (parent.height / 5) + 1
+                params.height = (parent.height * 0.13).toInt() + 1
                 holder.view.layoutParams = params
                 holder
             }
@@ -58,6 +65,9 @@ class RecyclerAdapter(var items: List<BaseItem>) : RecyclerView.Adapter<BaseView
             }
             is DayInfoViewHolder -> {
                 holder.bind(items[position] as DayInfoItem)
+            }
+            is WeatherInfoViewHolder -> {
+                holder.bind(items[position] as WeatherInfoItem)
             }
             else -> {}
         }
