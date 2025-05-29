@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import com.example.sunrisemoonriseapp.day.Day
 import com.example.sunrisemoonriseapp.entities.Moon
 import com.example.sunrisemoonriseapp.entities.Place
+import com.example.sunrisemoonriseapp.entities.Weather
 
 class SkyItem(
     val resetClickListener: () -> Unit,
@@ -22,6 +23,7 @@ class SkyItem(
     val moonLiveData: MutableLiveData<Moon>,
     val animDurationLiveData: MutableLiveData<Long>,
     val placeLiveData: MutableLiveData<Place>,
+    val weatherLiveData: MutableLiveData<Weather>,
 ) : BaseItem {
     override val type: Int
         get() = BaseItem.Type.SkyItem.value

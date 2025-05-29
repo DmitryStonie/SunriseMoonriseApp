@@ -29,6 +29,7 @@ import androidx.lifecycle.LifecycleOwner
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.math.round
 
 class SkyViewHolder(val view: View) : BaseViewHolder(view) {
     private val skyDawn1Color: Int by lazy {
@@ -170,6 +171,8 @@ class SkyViewHolder(val view: View) : BaseViewHolder(view) {
     val aboutButtonView: ImageView = view.findViewById<ImageView>(R.id.aboutButton)
     val menuButtonView: ImageView = view.findViewById<ImageView>(R.id.menuButton)
     val placeNameView: TextView = view.findViewById<TextView>(R.id.placeName)
+    val temperatureTextView: TextView = view.findViewById<TextView>(R.id.temperatureText)
+    val weatherNameTextView: TextView = view.findViewById<TextView>(R.id.weatherName)
 
 
     fun bind(item: SkyItem) {
@@ -212,6 +215,10 @@ class SkyViewHolder(val view: View) : BaseViewHolder(view) {
                 placeNameView.isVisible = true
                 placeNameView.text = place.name
             }
+        }
+        item.weatherLiveData.observe(view.context as LifecycleOwner) { weather ->
+            temperatureTextView.text = "${round(weather.temperature).toInt()}℃"
+            weatherNameTextView.text = weather.description.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
         }
         resetButtonView.setOnClickListener {
             animations.cancel()

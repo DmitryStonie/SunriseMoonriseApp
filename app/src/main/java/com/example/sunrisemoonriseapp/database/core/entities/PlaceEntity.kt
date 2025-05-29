@@ -1,4 +1,4 @@
-package com.example.sunrisemoonriseapp.database.core
+package com.example.sunrisemoonriseapp.database.core.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

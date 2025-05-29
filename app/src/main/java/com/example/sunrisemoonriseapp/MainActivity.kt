@@ -81,7 +81,8 @@ class MainActivity : AppCompatActivity() {
                     viewModel.dayInfo,
                     viewModel.moonInfo,
                     viewModel.animDuration,
-                    viewModel.placeInfo
+                    viewModel.placeInfo,
+                    viewModel.weatherInfo
                 ), DayInfoItem(viewModel.dayInfo)
             )
         )
@@ -93,6 +94,7 @@ class MainActivity : AppCompatActivity() {
         var curDate = -1
         viewModel.placeInfo.observe(this) {
             viewModel.getDayInfo(it.latitude, it.longitude)
+            viewModel.getWeatherInfo(it.latitude, it.longitude)
             Log.d("INFO", "Got place $it")
         }
         viewModel.dayInfo.observe(this) { day ->
@@ -115,6 +117,10 @@ class MainActivity : AppCompatActivity() {
                 viewModel.getMoonInfo()
                 curDate = calendar.get(Calendar.DATE)
             }
+        }
+        viewModel.weatherInfo.observe(this) { weather ->
+            Log.d("INFO", " got weather $weather")
+            viewModel.saveWeather()
         }
         ViewCompat.setOnApplyWindowInsetsListener(mainView) { v, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())

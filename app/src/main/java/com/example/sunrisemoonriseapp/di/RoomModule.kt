@@ -3,9 +3,11 @@ package com.example.sunrisemoonriseapp.di
 import android.content.Context
 import androidx.room.Room
 import com.example.sunrisemoonriseapp.database.core.Database
-import com.example.sunrisemoonriseapp.database.core.DayDao
-import com.example.sunrisemoonriseapp.database.core.MoonDao
-import com.example.sunrisemoonriseapp.database.core.PlaceDao
+import com.example.sunrisemoonriseapp.database.core.MIGRATION_1_2
+import com.example.sunrisemoonriseapp.database.core.daos.DayDao
+import com.example.sunrisemoonriseapp.database.core.daos.MoonDao
+import com.example.sunrisemoonriseapp.database.core.daos.PlaceDao
+import com.example.sunrisemoonriseapp.database.core.daos.WeatherDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,7 +28,7 @@ class RoomModule {
             context,
             Database::class.java,
             databaseName,
-        ).build()
+        ).addMigrations(MIGRATION_1_2).build()
 
     @Provides
     fun provideDayDao(database: Database): DayDao = database.dayDao()
@@ -36,4 +38,7 @@ class RoomModule {
 
     @Provides
     fun providePlaceDao(database: Database): PlaceDao = database.placeDao()
+
+    @Provides
+    fun provideWeatherDao(database: Database): WeatherDao = database.weatherDao()
 }

@@ -18,10 +18,12 @@ import com.example.sunrisemoonriseapp.day.Day.Companion.NIGHT_END_END_DEFAULT
 import com.example.sunrisemoonriseapp.day.DayState
 import com.example.sunrisemoonriseapp.entities.Moon
 import com.example.sunrisemoonriseapp.entities.Place
+import com.example.sunrisemoonriseapp.entities.Weather
 import com.example.sunrisemoonriseapp.recyclerview.viewholders.SkyViewHolder.Companion.ANIM_DURATION
 import com.example.sunrisemoonriseapp.repository.MoonRepository
 import com.example.sunrisemoonriseapp.repository.PlaceRepository
 import com.example.sunrisemoonriseapp.repository.SunRepository
+import com.example.sunrisemoonriseapp.repository.WeatherRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -36,7 +38,8 @@ import javax.inject.Inject
 class MainScreenViewModel @Inject constructor(
     val sunRepository: SunRepository,
     val moonRepository: MoonRepository,
-    val placeRepository: PlaceRepository
+    val placeRepository: PlaceRepository,
+    val weatherRepository: WeatherRepository
 ) : ViewModel() {
 
     lateinit var day: Day
@@ -51,6 +54,7 @@ class MainScreenViewModel @Inject constructor(
     val moonInfo: MutableLiveData<Moon> = MutableLiveData<Moon>()
     val placeInfo: MutableLiveData<Place> = MutableLiveData<Place>()
     val animDuration: MutableLiveData<Long> = MutableLiveData<Long>()
+    val weatherInfo: MutableLiveData<Weather> = MutableLiveData<Weather>()
     val time: MutableLiveData<Long> by lazy {
         systemTime = System.currentTimeMillis()
         viewModelScope.launch {
@@ -185,13 +189,14 @@ class MainScreenViewModel @Inject constructor(
 
     fun getPlaceInfo() {
         viewModelScope.launch {
-            val place = placeRepository.getLocalPlace() ?: Place("55.0415", "82.9346", "Новосибирск")
+            val place =
+                placeRepository.getLocalPlace() ?: Place("55.0415", "82.9346", "Новосибирск")
             placeInfo.postValue(place)
         }
     }
 
     fun savePlaceInfo() {
-        if(placeInfo.value != null) {
+        if (placeInfo.value != null) {
             viewModelScope.launch {
                 placeRepository.updatePlace(placeInfo.value!!)
                 launch {
@@ -202,28 +207,65 @@ class MainScreenViewModel @Inject constructor(
                         placeInfo.value!!.longitude
                     )
                 }.join()
+                val date =
+                    if (systemTime == 0L) formatter.format(Date(System.currentTimeMillis())) else formatter.format(
+                        Date(systemTime)
+                    )
+                weatherInfo.postValue(
+                    weatherRepository.getWeatherRemote(
+                        placeInfo.value!!.latitude,
+                        placeInfo.value!!.longitude
+                    )?.copy(date = date)
+                )
             }
         }
     }
 
-    fun getPlaceName(latitude: String, longitude: String){
+    fun getPlaceName(latitude: String, longitude: String) {
         viewModelScope.launch {
             val name = placeRepository.getPlaceName(Place(latitude, longitude, ""))
-            placeInfo.postValue(Place(latitude,longitude, name ?: ""))
+            placeInfo.postValue(Place(latitude, longitude, name ?: ""))
         }
     }
 
-    private fun getDate(): String{
+    private fun getDate(): String {
         return if (systemTime == 0L) formatter.format(Date(System.currentTimeMillis())) else formatter.format(
             Date(systemTime)
         )
     }
 
-    private fun getSunDate(): String{
+    private fun getSunDate(): String {
         return if (systemTime == 0L) formatterForSun.format(Date(System.currentTimeMillis())) else formatter.format(
             Date(systemTime)
         )
     }
 
+    fun getWeatherInfo(latitude: String, longitude: String) {
+        viewModelScope.launch {
+            val date =
+                if (systemTime == 0L) formatter.format(Date(System.currentTimeMillis())) else formatter.format(
+                    Date(systemTime)
+                )
+            val weather = weatherRepository.getWeather(date)
+            weatherInfo.postValue(
+                weather ?: weatherRepository.getWeatherRemote(
+                    latitude, longitude
+                )?.copy(date = date)
+            )
+            weatherInfo.postValue(
+                weather ?: weatherRepository.getWeatherRemote(
+                    latitude, longitude
+                )
+            )
+        }
+    }
+
+    fun saveWeather() {
+        viewModelScope.launch {
+            if (weatherInfo.value != null) {
+                weatherRepository.saveWeather(weatherInfo.value!!)
+            }
+        }
+    }
 
 }

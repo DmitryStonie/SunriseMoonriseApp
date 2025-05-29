@@ -24,6 +24,14 @@ fun getGeocoderApiKey(): String {
     return properties.getProperty("GEOCODER_API_KEY", "")
 }
 
+fun getOpenWeatherApiKey(): String {
+    val properties = Properties()
+    val stream = project.file("keystore.properties").inputStream()
+    properties.load(stream)
+    stream.close()
+    return properties.getProperty("OPEN_WEATHER_API_KEY", "")
+}
+
 android {
     namespace = "com.example.sunrisemoonriseapp"
     compileSdk = 35
@@ -38,9 +46,11 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         val mapkitApiKey = getMapkitApiKey()
         val geocoderApiKey = getGeocoderApiKey()
+        val openWeatherApiKey = getOpenWeatherApiKey()
 
         buildConfigField("String", "MAPKIT_API_KEY", "\"${mapkitApiKey}\"")
         buildConfigField("String", "GEOCODER_API_KEY", "\"${geocoderApiKey}\"")
+        buildConfigField("String", "OPEN_WEATHER_API_KEY", "\"${openWeatherApiKey}\"")
     }
 
     buildTypes {

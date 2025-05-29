@@ -1,7 +1,7 @@
 package com.example.sunrisemoonriseapp.database.datasources
 
-import com.example.sunrisemoonriseapp.database.core.DayDao
-import com.example.sunrisemoonriseapp.database.core.DayEntity
+import com.example.sunrisemoonriseapp.database.core.daos.DayDao
+import com.example.sunrisemoonriseapp.database.core.entities.DayEntity
 import com.example.sunrisemoonriseapp.entities.Day
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
