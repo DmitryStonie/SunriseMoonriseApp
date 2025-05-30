@@ -260,6 +260,20 @@ class MainScreenViewModel @Inject constructor(
         }
     }
 
+    fun getWeatherInfoRemote(latitude: String, longitude: String) {
+        viewModelScope.launch {
+            val date =
+                if (systemTime == 0L) formatter.format(Date(System.currentTimeMillis())) else formatter.format(
+                    Date(systemTime)
+                )
+            weatherInfo.postValue(
+                weatherRepository.getWeatherRemote(
+                    latitude, longitude
+                )?.copy(date = date)
+            )
+        }
+    }
+
     fun saveWeather() {
         viewModelScope.launch {
             if (weatherInfo.value != null) {

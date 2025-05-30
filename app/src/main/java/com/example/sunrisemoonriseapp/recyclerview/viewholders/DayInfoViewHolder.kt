@@ -7,6 +7,7 @@ import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import com.example.sunrisemoonriseapp.R
 import com.example.sunrisemoonriseapp.getTimeValue
+import com.example.sunrisemoonriseapp.getTimeValueShort
 import com.example.sunrisemoonriseapp.recyclerview.items.DayInfoItem
 
 class DayInfoViewHolder(val view: View): BaseViewHolder(view){
@@ -24,13 +25,13 @@ class DayInfoViewHolder(val view: View): BaseViewHolder(view){
             if (day == null) {
                 Log.d("DATA", "day is null")
             } else {
-                dayLengthText.text = (day.sunset.start - day.sunrise.start).getTimeValue()
-                sunriseText.text = day.sunrise.start.getTimeValue()
-                sunsetText.text = day.sunset.start.getTimeValue()
+                dayLengthText.text = (day.sunset.start - day.sunrise.start).getTimeValueShort()
+                sunriseText.text = day.sunrise.start.getTimeValueShort()
+                sunsetText.text = day.sunset.start.getTimeValueShort()
             }
         }
         item.weatherInfo.observe(view.context as LifecycleOwner) { weather ->
-            cloudinessText.text = "${weather.cloudiness} %"
+            cloudinessText.text = "${weather.cloudiness}%"
             windSpeedText.text = "${weather.windSpeed} м/с"
             windDegreeText.text = if(weather.windDegree in 338..360 || weather.windDegree in 0..22){
                 "C"

@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="20dp"
             android:layout_marginTop="8dp"
-            android:text="Ощущается как"
+            android:text="Ощущ. как"
             android:textColor="@color/white"
             android:textSize="22sp"
 
@@ -187,7 +187,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/humidityText"
 
-            tools:text="746 мм." />
+            tools:text="746 мм" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

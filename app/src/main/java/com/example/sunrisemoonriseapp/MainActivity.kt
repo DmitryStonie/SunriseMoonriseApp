@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity() {
         var curDate = -1
         viewModel.placeInfo.observe(this) {
             viewModel.getDayInfo(it.latitude, it.longitude)
-            viewModel.getWeatherInfo(it.latitude, it.longitude)
+            viewModel.getWeatherInfoRemote(it.latitude, it.longitude)
             Log.d("INFO", "Got place $it")
         }
         viewModel.dayInfo.observe(this) { day ->
@@ -150,6 +150,12 @@ fun Int.getTimeValue(): String {
     val seconds = this % 60
 
     return String.format(Locale.US, "%02d:%02d:%02d", hours, minutes, seconds)
+}
+fun Int.getTimeValueShort(): String {
+    val hours = this / 3600
+    val minutes = (this % 3600) / 60
+
+    return String.format(Locale.US, "%02d:%02d", hours, minutes)
 }
 
 fun getAnimProgress(start: Int, end: Int, current: Int): Float {

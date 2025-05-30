@@ -1,11 +1,7 @@
 package com.example.sunrisemoonriseapp.di
 
-import com.example.sunrisemoonriseapp.retrofit.geocoder.GeocoderRemoteData
-import com.example.sunrisemoonriseapp.retrofit.geocoder.GeocoderService
 import com.example.sunrisemoonriseapp.retrofit.openweather.OpenWeatherRemoteData
 import com.example.sunrisemoonriseapp.retrofit.openweather.OpenWeatherService
-import com.example.sunrisemoonriseapp.retrofit.sun.SunRemoteData
-import com.example.sunrisemoonriseapp.retrofit.sun.SunriseService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

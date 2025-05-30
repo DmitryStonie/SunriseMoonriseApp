@@ -1,10 +1,6 @@
 package com.example.sunrisemoonriseapp.database.datasources
 
-import com.example.sunrisemoonriseapp.database.core.daos.PlaceDao
 import com.example.sunrisemoonriseapp.database.core.daos.WeatherDao
-import com.example.sunrisemoonriseapp.database.core.entities.PlaceEntity
-import com.example.sunrisemoonriseapp.database.core.entities.WeatherEntity
-import com.example.sunrisemoonriseapp.entities.Place
 import com.example.sunrisemoonriseapp.entities.Weather
 import com.example.sunrisemoonriseapp.mappers.toWeather
 import com.example.sunrisemoonriseapp.mappers.toWeatherEntity
