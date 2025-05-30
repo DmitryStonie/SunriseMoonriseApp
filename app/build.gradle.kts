@@ -16,6 +16,22 @@ fun getMapkitApiKey(): String {
     return properties.getProperty("MAPKIT_API_KEY", "")
 }
 
+fun getGeocoderApiKey(): String {
+    val properties = Properties()
+    val stream = project.file("keystore.properties").inputStream()
+    properties.load(stream)
+    stream.close()
+    return properties.getProperty("GEOCODER_API_KEY", "")
+}
+
+fun getOpenWeatherApiKey(): String {
+    val properties = Properties()
+    val stream = project.file("keystore.properties").inputStream()
+    properties.load(stream)
+    stream.close()
+    return properties.getProperty("OPEN_WEATHER_API_KEY", "")
+}
+
 android {
     namespace = "com.example.sunrisemoonriseapp"
     compileSdk = 35
@@ -29,8 +45,12 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         val mapkitApiKey = getMapkitApiKey()
+        val geocoderApiKey = getGeocoderApiKey()
+        val openWeatherApiKey = getOpenWeatherApiKey()
 
         buildConfigField("String", "MAPKIT_API_KEY", "\"${mapkitApiKey}\"")
+        buildConfigField("String", "GEOCODER_API_KEY", "\"${geocoderApiKey}\"")
+        buildConfigField("String", "OPEN_WEATHER_API_KEY", "\"${openWeatherApiKey}\"")
     }
 
     buildTypes {
@@ -94,6 +114,9 @@ dependencies {
     //fragment
     val fragment_version = "1.8.6"
     implementation("androidx.fragment:fragment-ktx:$fragment_version")
+    //lifecycle ktx
+    val lifecycle_ktx_version = "2.8.7"
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_ktx_version")
 }
 
 kapt {

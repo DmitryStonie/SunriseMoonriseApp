@@ -1,7 +1,7 @@
 package com.example.sunrisemoonriseapp.database.datasources
 
-import com.example.sunrisemoonriseapp.database.core.PlaceDao
-import com.example.sunrisemoonriseapp.database.core.PlaceEntity
+import com.example.sunrisemoonriseapp.database.core.daos.PlaceDao
+import com.example.sunrisemoonriseapp.database.core.entities.PlaceEntity
 import com.example.sunrisemoonriseapp.entities.Place
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -14,7 +14,8 @@ class LocalPlaceDataSource @Inject constructor(val placeDao: PlaceDao) {
             return@withContext if (entity == null) null else
                 Place(
                     entity.latitude,
-                    entity.longitude
+                    entity.longitude,
+                    entity.name
                 )
         }
     }
@@ -23,7 +24,7 @@ class LocalPlaceDataSource @Inject constructor(val placeDao: PlaceDao) {
             placeDao.insertPlace(
                 PlaceEntity(
                     0,
-                    "",
+                    place.name,
                     place.latitude,
                     place.longitude
                 )

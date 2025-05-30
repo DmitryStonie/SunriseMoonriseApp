@@ -1,18 +1,15 @@
 package com.example.sunrisemoonriseapp.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import androidx.core.os.bundleOf
-import androidx.fragment.app.viewModels
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import com.example.sunrisemoonriseapp.MainActivity
 import com.example.sunrisemoonriseapp.MainScreenViewModel
 import com.example.sunrisemoonriseapp.R
-import com.example.sunrisemoonriseapp.entities.Place
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.InputListener
@@ -24,19 +21,19 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlin.getValue
 
 @AndroidEntryPoint
-class PlaceFragment: Fragment() {
-    private val viewModel:MainScreenViewModel  by activityViewModels<MainScreenViewModel>()
+class PlaceFragment : Fragment() {
+    private val viewModel: MainScreenViewModel by activityViewModels<MainScreenViewModel>()
 
     private lateinit var mapView: MapView
     private lateinit var backButtonView: View
     private lateinit var selectButtonView: View
+    private lateinit var placeNameView: TextView
 
 
     lateinit var inputListener: InputListener
     lateinit var placemarkTapListener: MapObjectTapListener
     lateinit var imageProvider: ImageProvider
     var selectedPlacemark: MapObject? = null
-    var place: Place? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,11 +48,16 @@ class PlaceFragment: Fragment() {
         mapView = view.findViewById<MapView>(R.id.mapview)
         backButtonView = view.findViewById(R.id.back)
         selectButtonView = view.findViewById(R.id.select)
+        placeNameView = view.findViewById(R.id.placeName)
+
+        viewModel.placeInfo.observe(viewLifecycleOwner) { place ->
+            Log.d("INFO", "$place")
+            placeNameView.text = place.name
+        }
 
         imageProvider = ImageProvider.fromResource(requireContext(), R.drawable.marker)
         placemarkTapListener = MapObjectTapListener { placemark, point ->
             placemark.isVisible = false
-            place = null
             true
         }
         inputListener = object : InputListener {
@@ -70,7 +72,7 @@ class PlaceFragment: Fragment() {
                 placemark.addTapListener(placemarkTapListener)
                 selectedPlacemark?.isVisible = false
                 selectedPlacemark = placemark
-                place = Place(p1.latitude.toString(), p1.longitude.toString())
+                viewModel.getPlaceName(p1.latitude.toString(), p1.longitude.toString())
             }
 
             override fun onMapLongTap(
@@ -82,16 +84,16 @@ class PlaceFragment: Fragment() {
                     setIcon(imageProvider)
                 }
                 placemark.addTapListener(placemarkTapListener)
-                place = Place(p1.latitude.toString(), p1.longitude.toString())
                 selectedPlacemark?.isVisible = false
                 selectedPlacemark = placemark
-                place = Place(p1.latitude.toString(), p1.longitude.toString())
             }
         }
-        if(viewModel.placeInfo.value != null){
-            place = viewModel.placeInfo.value!!
+        if (viewModel.placeInfo.value != null) {
             selectedPlacemark = mapView.mapWindow.map.mapObjects.addPlacemark().apply {
-                geometry = Point(place!!.latitude.toDouble(), place!!.longitude.toDouble())
+                geometry = Point(
+                    viewModel.placeInfo.value!!.latitude.toDouble(),
+                    viewModel.placeInfo.value!!.longitude.toDouble()
+                )
                 setIcon(imageProvider)
             }
             selectedPlacemark!!.addTapListener(placemarkTapListener)
@@ -99,15 +101,14 @@ class PlaceFragment: Fragment() {
 
         mapView.mapWindow.map.addInputListener(inputListener)
         selectButtonView.setOnClickListener {
-            place?.let{
-                viewModel.updatePlaceInfo(it)
-            }
+            viewModel.savePlaceInfo()
             parentFragmentManager.popBackStack()
         }
         backButtonView.setOnClickListener {
             parentFragmentManager.popBackStack()
         }
     }
+
     override fun onStart() {
         super.onStart()
         MapKitFactory.getInstance().onStart()

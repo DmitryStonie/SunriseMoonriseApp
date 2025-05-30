@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/day_phase_option"
+        android:title="@string/menu_day_phase_option_title">
+        <menu>
+            <item
+                android:id="@+id/sunrise_phase_option"
+                android:title="@string/menu_sunrise_option_text">
+            </item>
+            <item
+                android:id="@+id/noon_phase_option"
+                android:title="@string/menu_noon_option_text">
+            </item>
+            <item
+                android:id="@+id/sunset_phase_option"
+                android:title="@string/menu_sunset_option_text">
+            </item>
+            <item
+                android:id="@+id/night_phase_option"
+                android:title="@string/menu_night_option_text">
+            </item>
+        </menu>
+    </item>
+    <item android:id="@+id/speed_up_option"
+        android:title="@string/menu_speed_up_option_title" >
+
+    <menu>
+        <item
+            android:id="@+id/x1_speed_up_option"
+            android:title="@string/menu_x1_speed_up_option_text">
+        </item>
+        <item
+            android:id="@+id/x10_speed_up_option"
+            android:title="@string/menu_x10_speed_up_option_text">
+        </item>
+        <item
+            android:id="@+id/x100_speed_up_option"
+            android:title="@string/menu_x100_speed_up_option_text">
+        </item>
+        <item
+            android:id="@+id/x1000_speed_up_option"
+            android:title="@string/menu_x1000_speed_up_option_text">
+        </item>
+    </menu>
+    </item>
+</menu>
