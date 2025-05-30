@@ -6,6 +6,7 @@ plugins {
 
     id("com.google.dagger.hilt.android")
     id("kotlin-kapt")
+    id("com.google.devtools.ksp")
 }
 
 fun getMapkitApiKey(): String {
@@ -107,7 +108,7 @@ dependencies {
     val room_version = "2.7.1"
     implementation("androidx.room:room-runtime:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
-    kapt("androidx.room:room-compiler:$room_version")
+    ksp("androidx.room:room-compiler:$room_version")
     //MapKit
     val mapkit_version = "4.15.0-lite"
     implementation("com.yandex.android:maps.mobile:$mapkit_version")
