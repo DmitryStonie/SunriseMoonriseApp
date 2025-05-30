@@ -5,7 +5,8 @@
 Указание местоположения на карте (с названием места)  
 Фазы луны (работают частично) 
 Погода в данный момент
-![Alt text](screenshots/Screenshot_2025_05_08_15_20_04_064_com_example_sunrisemoonriseapp.jpg)
-![Alt text](screenshots/Screenshot_2025_05_08_15_20_17_246_com_example_sunrisemoonriseapp.jpg)
-![Alt text](screenshots/Screenshot_2025_05_08_15_20_50_769_com_example_sunrisemoonriseapp.jpg)
-![Alt text](screenshots/Screenshot_2025_05_08_15_21_11_532_com_example_sunrisemoonriseapp.jpg)
+![Alt text](screenshots/Screenshot_2025_05_30_10_06_44_131_com_example_sunrisemoonriseapp.jpg)
+![Alt text](screenshots/Screenshot_2025_05_30_10_07_05_829_com_example_sunrisemoonriseapp.jpg)
+![Alt text](screenshots/Screenshot_2025_05_30_10_07_19_420_com_example_sunrisemoonriseapp.jpg)
+![Alt text](screenshots/Screenshot_2025_05_30_10_07_52_734_com_example_sunrisemoonriseapp.jpg)
+![Alt text](screenshots/Screenshot_2025_05_30_10_08_09_299_com_example_sunrisemoonriseapp.jpg)
