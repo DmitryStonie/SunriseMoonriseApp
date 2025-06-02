@@ -6,6 +6,7 @@ plugins {
 
     id("com.google.dagger.hilt.android")
     id("kotlin-kapt")
+    id("com.google.devtools.ksp")
 }
 
 fun getMapkitApiKey(): String {
@@ -33,11 +34,15 @@ fun getOpenWeatherApiKey(): String {
 }
 
 android {
-    namespace = "com.example.sunrisemoonriseapp"
+    namespace = "com.dmitrystonie.sunrisemoonriseapp"
     compileSdk = 35
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
-        applicationId = "com.example.sunrisemoonriseapp"
+        applicationId = "com.dmitrystonie.sunrisemoonriseapp"
         minSdk = 26
         targetSdk = 35
         versionCode = 3
@@ -81,9 +86,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.junit.ktx)
     testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
 
     //hilt
     val hilt_version = "2.56.1"
@@ -107,7 +111,7 @@ dependencies {
     val room_version = "2.7.1"
     implementation("androidx.room:room-runtime:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
-    kapt("androidx.room:room-compiler:$room_version")
+    ksp("androidx.room:room-compiler:$room_version")
     //MapKit
     val mapkit_version = "4.15.0-lite"
     implementation("com.yandex.android:maps.mobile:$mapkit_version")
@@ -117,6 +121,21 @@ dependencies {
     //lifecycle ktx
     val lifecycle_ktx_version = "2.8.7"
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_ktx_version")
+    //espresso
+    val runner_version = "1.6.1"
+    val core_version = "1.6.1"
+    val espresso_version = "3.6.1"
+    val ext_junit_version = "1.2.1"
+    val hamcrest_version = "2.2"
+    androidTestImplementation("androidx.test:runner:$runner_version")
+    androidTestImplementation("androidx.test:rules:$core_version")
+    androidTestImplementation("androidx.test.espresso:espresso-core:$espresso_version")
+    androidTestImplementation("androidx.test.espresso:espresso-contrib:$espresso_version")
+    androidTestImplementation("androidx.test.ext:junit:$ext_junit_version")
+    androidTestImplementation("org.hamcrest:hamcrest:$hamcrest_version")
+    debugImplementation("androidx.test:core-ktx:$core_version")
+    implementation("androidx.test.espresso:espresso-idling-resource:$espresso_version")
+
 }
 
 kapt {

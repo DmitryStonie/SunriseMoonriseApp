@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/element"
+    android:id="@+id/dayInfo"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/ground_day">
@@ -22,14 +22,16 @@
 
 
         <ImageView
-            android:id="@+id/cloudinessTitle"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="5dp"
+            android:id="@+id/cloudinessIcon"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_gravity="center"
+            android:scaleType="centerCrop"
+            android:layout_marginStart="8dp"
             android:background="@drawable/cloud"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/windSpeedText"
 
             />
 
@@ -40,10 +42,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:layout_marginBottom="8dp"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="8dp"
             android:text=""
             android:textColor="@color/white"
-            android:textSize="22sp"
+            android:textSize="20sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             tools:text="С/З"
@@ -56,9 +58,9 @@
             android:layout_marginTop="8dp"
             android:layout_marginStart="16dp"
             android:textColor="@color/white"
-            android:textSize="22sp"
+            android:textSize="20sp"
 
-            app:layout_constraintStart_toEndOf="@id/cloudinessTitle"
+            app:layout_constraintStart_toEndOf="@id/cloudinessIcon"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="85%" />
 
@@ -66,11 +68,11 @@
             android:id="@+id/windSpeedText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="8dp"
             android:layout_marginBottom="6dp"
 
             android:textColor="@color/white"
-            android:textSize="22sp"
+            android:textSize="20sp"
 
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toTopOf="@id/windDegreeText"
@@ -83,7 +85,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="6dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -107,16 +109,16 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/humidityTitle"
+            android:id="@+id/dayLengthTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:text="@string/day_length_title"
             android:textColor="@color/white"
-            android:textSize="22sp"
+            android:textSize="20sp"
 
-            app:layout_constraintBottom_toTopOf="@id/pressureTitle"
+            app:layout_constraintBottom_toTopOf="@id/sunriseTitle"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
 
@@ -124,31 +126,31 @@
             />
 
         <TextView
-            android:id="@+id/pressureTitle"
+            android:id="@+id/sunriseTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="6dp"
             android:text="@string/sunrise_title"
             android:textColor="@color/white"
-            android:textSize="22sp"
+            android:textSize="20sp"
             app:layout_constraintBottom_toTopOf="@id/sunsetTitle"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/humidityTitle" />
+            app:layout_constraintTop_toBottomOf="@id/dayLengthTitle" />
 
         <TextView
             android:id="@+id/sunsetTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="6dp"
             android:layout_marginBottom="8dp"
             android:text="@string/sunset_title"
             android:textColor="@color/white"
-            android:textSize="22sp"
+            android:textSize="20sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/pressureTitle"
+            app:layout_constraintTop_toBottomOf="@id/sunriseTitle"
 
             />
 
@@ -157,9 +159,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:layout_marginEnd="20dp"
+            android:layout_marginEnd="8dp"
             android:textColor="@color/white"
-            android:textSize="22sp"
+            android:textSize="20sp"
 
             app:layout_constraintBottom_toTopOf="@id/sunriseText"
             app:layout_constraintEnd_toEndOf="parent"
@@ -171,9 +173,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:layout_marginEnd="20dp"
+            android:layout_marginEnd="8dp"
             android:textColor="@color/white"
-            android:textSize="22sp"
+            android:textSize="20sp"
 
             app:layout_constraintBottom_toTopOf="@id/sunsetText"
             app:layout_constraintEnd_toEndOf="parent"
@@ -186,10 +188,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:layout_marginEnd="20dp"
+            android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
             android:textColor="@color/white"
-            android:textSize="22sp"
+            android:textSize="20sp"
 
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
