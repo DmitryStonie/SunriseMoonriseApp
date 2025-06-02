@@ -34,7 +34,7 @@ fun getOpenWeatherApiKey(): String {
 }
 
 android {
-    namespace = "com.dmitrystonie.sunrisemoonriseapp"
+    namespace = "com.example.sunrisemoonriseapp"
     compileSdk = 35
 
     buildFeatures {
@@ -42,7 +42,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.dmitrystonie.sunrisemoonriseapp"
+        applicationId = "com.example.sunrisemoonriseapp"
         minSdk = 26
         targetSdk = 35
         versionCode = 4
