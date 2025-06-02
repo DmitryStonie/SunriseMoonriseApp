@@ -21,7 +21,7 @@ class WeatherInfoViewHolder(val view: View) : BaseViewHolder(view) {
             temperatureMaxText.text = "${round(weather.temperatureMax).toInt()}℃"
             temperatureMinText.text = "${round(weather.temperatureMin).toInt()}℃"
             humidityText.text = "${weather.humidity}%"
-            pressureText.text = "${(weather.pressure / 1.3333).toInt()} мм."
+            pressureText.text = "${(weather.pressure / 1.3333).toInt()}мм"
         }
     }
 

@@ -1,6 +1,7 @@
 package com.dmitrystonie.sunrisemoonriseapp.presentation.recyclerview
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.DiffUtil
@@ -38,7 +39,7 @@ class RecyclerAdapter(var items: List<BaseItem>) : RecyclerView.Adapter<BaseView
             BaseItem.Type.WeatherInfoItem.value -> {
                 val view = LayoutInflater.from(parent.context).inflate(R.layout.recycler_weather_info_element, parent, false)
                 val holder = WeatherInfoViewHolder(view)
-                val params = holder.view.findViewById<ConstraintLayout>(R.id.element).layoutParams as RecyclerView.LayoutParams
+                val params = holder.view.findViewById<ConstraintLayout>(R.id.weatherInfo).layoutParams as RecyclerView.LayoutParams
                 params.height = (parent.height * 0.13).toInt() + 1
                 holder.view.layoutParams = params
                 holder

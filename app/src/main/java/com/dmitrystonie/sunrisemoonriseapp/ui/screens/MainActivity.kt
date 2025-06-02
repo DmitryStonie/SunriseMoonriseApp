@@ -7,18 +7,24 @@ import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.annotation.NonNull
+import androidx.annotation.Nullable
+import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.test.espresso.IdlingResource
 import com.dmitrystonie.sunrisemoonriseapp.R
 import com.dmitrystonie.sunrisemoonriseapp.presentation.MainScreenViewModel
 import com.dmitrystonie.sunrisemoonriseapp.presentation.recyclerview.RecyclerAdapter
 import com.dmitrystonie.sunrisemoonriseapp.presentation.recyclerview.items.DayInfoItem
 import com.dmitrystonie.sunrisemoonriseapp.presentation.recyclerview.items.SkyItem
 import com.dmitrystonie.sunrisemoonriseapp.presentation.recyclerview.items.WeatherInfoItem
+import com.dmitrystonie.sunrisemoonriseapp.ui.testing.MessageDelayer
+import com.dmitrystonie.sunrisemoonriseapp.ui.testing.SimpleIdlingResource
 import com.yandex.mapkit.MapKitFactory
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Calendar
@@ -26,12 +32,15 @@ import java.util.Date
 import java.util.Locale
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), MessageDelayer.DelayerCallback  {
     private lateinit var eventsRecyclerView: RecyclerView
 
     private val viewModel by viewModels<MainScreenViewModel>()
     lateinit var mainView: View
 
+    // The Idling Resource which will be null in production.
+    @Nullable
+    private var mIdlingResource: SimpleIdlingResource? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d("INFO", "MainActivity successfully created $this")
@@ -122,7 +131,8 @@ class MainActivity : AppCompatActivity() {
         }
         viewModel.weatherInfo.observe(this) { weather ->
             Log.d("INFO", " got weather $weather")
-            viewModel.saveWeather()
+//            viewModel.saveWeather()
+            MessageDelayer.processMessage("work done", this, mIdlingResource);
         }
         ViewCompat.setOnApplyWindowInsetsListener(mainView) { v, windowInsets ->
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -134,6 +144,23 @@ class MainActivity : AppCompatActivity() {
             WindowInsetsCompat.CONSUMED
         }
 
+    }
+    /**
+     * Only called from test, creates and returns a new {@link SimpleIdlingResource}.
+     */
+    @VisibleForTesting
+    @NonNull
+    fun getIdlingResource(): IdlingResource {
+        Log.d("INFO_ACTIVITY", "requested indlingres")
+        if (mIdlingResource == null) {
+            mIdlingResource = SimpleIdlingResource()
+        }
+        return mIdlingResource!!
+    }
+
+    override fun onDone(text: String?) {
+        Log.d("INFO_ACTIVITY", "done try to save")
+        viewModel.saveWeather()
     }
 
 
