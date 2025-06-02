@@ -1,6 +1,9 @@
 package com.dmitrystonie.sunrisemoonriseapp
 
+import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.IdlingRegistry
+import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
@@ -13,6 +16,8 @@ import com.dmitrystonie.sunrisemoonriseapp.presentation.recyclerview.viewholders
 import com.dmitrystonie.sunrisemoonriseapp.presentation.recyclerview.viewholders.WeatherInfoViewHolder
 import com.dmitrystonie.sunrisemoonriseapp.ui.screens.MainActivity
 import org.hamcrest.CoreMatchers.not
+import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -22,8 +27,18 @@ import org.junit.runner.RunWith
 @LargeTest
 class SkyViewTest {
 
-    @get:Rule
-    val activityRule = ActivityScenarioRule(MainActivity::class.java)
+    private var mIdlingResource: IdlingResource? = null
+
+    @Before
+    fun registerIdlingResource() {
+        val activityScenario: ActivityScenario<*> =
+            ActivityScenario.launch<MainActivity>(MainActivity::class.java)
+        activityScenario.onActivity { activity ->
+            mIdlingResource = (activity as MainActivity).getIdlingResource();
+            // To prove that the test fails, omit this call:
+            IdlingRegistry.getInstance().register(mIdlingResource);
+        }
+    }
 
     @Test
     fun skyViewHolder_exists() {
@@ -47,6 +62,12 @@ class SkyViewTest {
                 RecyclerViewActions.scrollTo<DayInfoViewHolder>(withId(R.id.dayInfo))
             )
         onView(withId(R.id.weatherName)).check(matches(isDisplayed()))
+    }
+    @After
+    fun unregisterIdlingResource() {
+        if (mIdlingResource != null) {
+            IdlingRegistry.getInstance().unregister(mIdlingResource)
+        }
     }
 
 }
