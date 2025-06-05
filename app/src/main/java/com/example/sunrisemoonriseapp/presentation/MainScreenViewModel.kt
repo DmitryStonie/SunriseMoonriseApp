@@ -204,7 +204,8 @@ class MainScreenViewModel @Inject constructor(
                 weatherInfo.postValue(
                     weatherRepository.getWeatherRemote(
                         placeInfo.value!!.latitude,
-                        placeInfo.value!!.longitude
+                        placeInfo.value!!.longitude,
+                        date
                     )?.copy(date = date)
                 )
             }
@@ -239,12 +240,12 @@ class MainScreenViewModel @Inject constructor(
             val weather = weatherRepository.getWeather(date)
             weatherInfo.postValue(
                 weather ?: weatherRepository.getWeatherRemote(
-                    latitude, longitude
+                    latitude, longitude, date
                 )?.copy(date = date)
             )
             weatherInfo.postValue(
                 weather ?: weatherRepository.getWeatherRemote(
-                    latitude, longitude
+                    latitude, longitude, date
                 )
             )
         }
@@ -258,7 +259,7 @@ class MainScreenViewModel @Inject constructor(
                 )
             weatherInfo.postValue(
                 weatherRepository.getWeatherRemote(
-                    latitude, longitude
+                    latitude, longitude, date
                 )?.copy(date = date)
             )
         }
