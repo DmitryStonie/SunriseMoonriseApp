@@ -34,7 +34,7 @@ fun getOpenWeatherApiKey(): String {
 }
 
 android {
-    namespace = "com.dmitrystonie.sunrisemoonriseapp"
+    namespace = "com.example.sunrisemoonriseapp"
     compileSdk = 35
 
     buildFeatures {
@@ -42,11 +42,11 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.dmitrystonie.sunrisemoonriseapp"
+        applicationId = "com.example.sunrisemoonriseapp"
         minSdk = 26
         targetSdk = 35
-        versionCode = 3
-        versionName = "1.0.2"
+        versionCode = 4
+        versionName = "1.0.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         val mapkitApiKey = getMapkitApiKey()
