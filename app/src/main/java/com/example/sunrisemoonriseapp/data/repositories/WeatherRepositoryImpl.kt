@@ -15,20 +15,26 @@ class WeatherRepositoryImpl @Inject constructor(
     private val openWeatherRemoteData: OpenWeatherRemoteData,
     private val localDataSource: LocalWeatherDataSource
 ) : WeatherRepository {
-    override suspend fun getWeatherRemote(latitude: String, longitude: String): Weather? {
+    override suspend fun getWeatherRemote(
+        latitude: String,
+        longitude: String,
+        date: String
+    ): Weather? {
         return withContext(Dispatchers.IO) {
             val response = openWeatherRemoteData.getWeather(latitude, longitude)
-            if (response.isSuccessful) {
+            if (response == null) {
+                return@withContext getWeather(date)
+            } else if (response.isSuccessful) {
                 return@withContext response.body()?.toWeather()
             } else {
-                return@withContext null
+                return@withContext getWeather(date)
             }
         }
     }
 
     override suspend fun getWeather(date: String): Weather? {
         return withContext(Dispatchers.IO) {
-            return@withContext localDataSource.getWeather(date)
+            localDataSource.getWeather(date)
         }
     }
 
