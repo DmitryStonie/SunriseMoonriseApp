@@ -7,6 +7,8 @@ plugins {
     id("com.google.dagger.hilt.android")
     id("kotlin-kapt")
     id("com.google.devtools.ksp")
+    id("com.google.firebase.crashlytics")
+    alias(libs.plugins.google.gms.google.services)
 }
 
 fun getMapkitApiKey(): String {
@@ -136,6 +138,13 @@ dependencies {
     debugImplementation("androidx.test:core-ktx:$core_version")
     implementation("androidx.test.espresso:espresso-idling-resource:$espresso_version")
 
+    // Import the BoM for the Firebase platform
+    implementation(platform("com.google.firebase:firebase-bom:33.14.0"))
+
+    // Add the dependencies for the Crashlytics and Analytics libraries
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation("com.google.firebase:firebase-crashlytics")
+    implementation("com.google.firebase:firebase-analytics")
 }
 
 kapt {
