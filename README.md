@@ -1,5 +1,5 @@
 # Sunrise Moonrise app
-
+[Privacy policy](https://dmitrystonie.github.io/SunriseMoonriseApp/privacy-policy)
 Приложение с красивой анимацией положения солнца и луны  
 Время рассвета, заката  
 Указание местоположения на карте (с названием места)  

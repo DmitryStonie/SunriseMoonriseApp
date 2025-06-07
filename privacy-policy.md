@@ -1,6 +1,7 @@
 layout: page
 title: "Privacy policy"
 permalink: /privacy-policy
+
 **Privacy Policy**
 
 This privacy policy applies to the Sunrise app app (hereby referred to as "Application") for mobile devices that was created by Yurin Mark (hereby referred to as "Service Provider") as a Free service. This service is intended for use "AS IS".
