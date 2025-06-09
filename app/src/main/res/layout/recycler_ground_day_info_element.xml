@@ -45,7 +45,7 @@
             android:layout_marginStart="8dp"
             android:text=""
             android:textColor="@color/white"
-            android:textSize="20sp"
+            android:textSize="@dimen/infoText"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             tools:text="С/З"
@@ -58,7 +58,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginStart="16dp"
             android:textColor="@color/white"
-            android:textSize="20sp"
+            android:textSize="@dimen/infoText"
 
             app:layout_constraintStart_toEndOf="@id/cloudinessIcon"
             app:layout_constraintTop_toTopOf="parent"
@@ -72,7 +72,7 @@
             android:layout_marginBottom="6dp"
 
             android:textColor="@color/white"
-            android:textSize="20sp"
+            android:textSize="@dimen/infoText"
 
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toTopOf="@id/windDegreeText"
@@ -116,7 +116,7 @@
             android:layout_marginTop="8dp"
             android:text="@string/day_length_title"
             android:textColor="@color/white"
-            android:textSize="20sp"
+            android:textSize="@dimen/infoText"
 
             app:layout_constraintBottom_toTopOf="@id/sunriseTitle"
             app:layout_constraintStart_toStartOf="parent"
@@ -133,7 +133,7 @@
             android:layout_marginTop="6dp"
             android:text="@string/sunrise_title"
             android:textColor="@color/white"
-            android:textSize="20sp"
+            android:textSize="@dimen/infoText"
             app:layout_constraintBottom_toTopOf="@id/sunsetTitle"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/dayLengthTitle" />
@@ -147,7 +147,7 @@
             android:layout_marginBottom="8dp"
             android:text="@string/sunset_title"
             android:textColor="@color/white"
-            android:textSize="20sp"
+            android:textSize="@dimen/infoText"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/sunriseTitle"
@@ -161,7 +161,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:textColor="@color/white"
-            android:textSize="20sp"
+            android:textSize="@dimen/infoText"
 
             app:layout_constraintBottom_toTopOf="@id/sunriseText"
             app:layout_constraintEnd_toEndOf="parent"
@@ -175,7 +175,7 @@
             android:layout_marginTop="6dp"
             android:layout_marginEnd="8dp"
             android:textColor="@color/white"
-            android:textSize="20sp"
+            android:textSize="@dimen/infoText"
 
             app:layout_constraintBottom_toTopOf="@id/sunsetText"
             app:layout_constraintEnd_toEndOf="parent"
@@ -191,7 +191,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
             android:textColor="@color/white"
-            android:textSize="20sp"
+            android:textSize="@dimen/infoText"
 
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

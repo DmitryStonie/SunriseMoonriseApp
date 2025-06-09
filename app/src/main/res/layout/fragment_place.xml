@@ -27,7 +27,7 @@
         android:layout_marginHorizontal="100dp"
         android:padding="10dp"
         tools:text="Новосибирская область"
-        android:textSize="20sp"
+        android:textSize="@dimen/infoText"
         android:textAppearance="?attr/textAppearanceTitleSmall"
         android:textColor="@color/white"
         android:textAlignment="center"

@@ -12,7 +12,7 @@
         android:text="Приложение использует Яндекс Карты. Условия использования Яндекс Карт: https://yandex.ru/legal/maps_api/ "
 
         android:textAlignment="center"
-        android:textSize="20dp"
+        android:textSize="@dimen/infoText"
         android:layout_marginHorizontal="30dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -25,7 +25,7 @@
         android:text="Приложение работает на https://sunrisesunset.io/"
 
         android:textAlignment="center"
-        android:textSize="20dp"
+        android:textSize="@dimen/infoText"
         android:layout_marginHorizontal="30dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -39,7 +39,7 @@
         android:text="Приложение работает на https://api.farmsense.net/ "
 
         android:textAlignment="center"
-        android:textSize="20dp"
+        android:textSize="@dimen/infoText"
         android:layout_marginHorizontal="30dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -52,7 +52,7 @@
         android:text="Приложение работает на  https://openweathermap.org/api"
 
         android:textAlignment="center"
-        android:textSize="20dp"
+        android:textSize="@dimen/infoText"
         android:layout_marginHorizontal="30dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -65,7 +65,7 @@
         android:text="Приложение работает на  https://yandex.ru/maps-api/products/geocoder-api"
 
         android:textAlignment="center"
-        android:textSize="20dp"
+        android:textSize="@dimen/infoText"
         android:layout_marginHorizontal="30dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
