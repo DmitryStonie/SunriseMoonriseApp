@@ -7,6 +7,24 @@
     android:layout_height="match_parent"
     >
 
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/leftBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="start"
+        app:constraint_referenced_ids="placeName,temperatureText"
+        app:layout_constraintStart_toStartOf="@id/temperatureText"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/rightBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="end"
+        app:constraint_referenced_ids="placeName,menuButton"
+        app:layout_constraintStart_toStartOf="@id/menuButton"
+        app:layout_constraintTop_toTopOf="parent"/>
+
     <FrameLayout
         android:id="@+id/sky"
         android:layout_width="match_parent"
@@ -17,7 +35,9 @@
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.0" >
+
+    </FrameLayout>
 
     <ImageView
         android:id="@+id/sun"
@@ -153,13 +173,12 @@
         android:id="@+id/placeName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/leftBarrier"
+        app:layout_constraintEnd_toEndOf="@id/rightBarrier"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="50dp"
-        android:layout_marginHorizontal="100dp"
         android:padding="10dp"
-        tools:text="Новосибирская область"
+        tools:text="Новосибирская область и район деревня город супер пупер"
         android:textSize="@dimen/infoText"
         android:textAppearance="?attr/textAppearanceTitleSmall"
         android:textColor="@color/white"
@@ -167,6 +186,8 @@
         android:background="@drawable/info_element_background"
         android:visibility="invisible"
         tools:visibility="visible"
+        android:maxLines="2"
+        android:ellipsize="end"
         />
     <TextView
         android:id="@+id/temperatureText"
@@ -178,7 +199,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="120dp"
-        android:layout_marginStart="40dp"
+        android:layout_marginStart="50dp"
         />
 
     <TextView
