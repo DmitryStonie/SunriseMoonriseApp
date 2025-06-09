@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="degreesText">72sp</dimen>
+    <dimen name="clockText">36sp</dimen>
+    <dimen name="weatherName">24sp</dimen>
+    <dimen name="infoText">20sp</dimen>
+</resources>

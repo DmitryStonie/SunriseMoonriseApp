@@ -77,7 +77,7 @@ class DayInfoViewTest {
         onView(withId(R.id.eventsRecyclerView)).perform(
             RecyclerViewActions.scrollTo<DayInfoViewHolder>(withId(R.id.dayInfo))
         )
-        onView(withId(R.id.cloudinessText)).check(isCompletelyLeftOf(withId(R.id.compasView)))
+        onView(withId(R.id.cloudinessText)).check(isCompletelyLeftOf(withId(R.id.compassView)))
     }
 
     @Test
@@ -85,7 +85,7 @@ class DayInfoViewTest {
         onView(withId(R.id.eventsRecyclerView)).perform(
             RecyclerViewActions.scrollTo<DayInfoViewHolder>(withId(R.id.dayInfo))
         )
-        onView(withId(R.id.windSpeedText)).check(isCompletelyLeftOf(withId(R.id.compasView)))
+        onView(withId(R.id.windSpeedText)).check(isCompletelyLeftOf(withId(R.id.compassView)))
     }
 
     @Test
@@ -93,7 +93,7 @@ class DayInfoViewTest {
         onView(withId(R.id.eventsRecyclerView)).perform(
             RecyclerViewActions.scrollTo<DayInfoViewHolder>(withId(R.id.dayInfo))
         )
-        onView(withId(R.id.windDegreeText)).check(isCompletelyLeftOf(withId(R.id.compasView)))
+        onView(withId(R.id.windDegreeText)).check(isCompletelyLeftOf(withId(R.id.compassView)))
     }
 
     @Test

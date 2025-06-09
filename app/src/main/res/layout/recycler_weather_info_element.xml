@@ -11,90 +11,70 @@
         android:id="@+id/tempView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginVertical="4dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="4dp"
-        android:layout_marginVertical="4dp"
         android:background="@drawable/info_element_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/atmosphereView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <androidx.constraintlayout.helper.widget.Flow
+            android:id="@+id/flowTemperature"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            app:constraint_referenced_ids="feelsLikeTitle,feelsLikeText,temperatureMinTitle,temperatureMaxText,temperatureMaxTitle,temperatureMinText"
+            app:flow_horizontalStyle="spread_inside"
+            app:flow_verticalGap="6dp"
+            app:flow_maxElementsWrap="2"
+            app:flow_wrapMode="chain"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
 
         <TextView
             android:id="@+id/feelsLikeTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:text="Ощущ. как"
+            android:text="@string/feels_like_title"
             android:textColor="@color/white"
-            android:textSize="20sp"
-
-            app:layout_constraintBottom_toTopOf="@id/temperatureMaxTitle"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-
-
-            />
+            android:textSize="@dimen/infoText" />
 
         <TextView
             android:id="@+id/temperatureMaxTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="6dp"
-            android:text="Темп. макс"
+            android:text="@string/temp_min_title"
             android:textColor="@color/white"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toTopOf="@id/temperatureMinTitle"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/feelsLikeTitle" />
+            android:textSize="@dimen/infoText" />
 
 
         <TextView
             android:id="@+id/temperatureMinTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="6dp"
-            android:layout_marginBottom="8dp"
-            android:text="Темп. мин"
+            android:text="@string/temp_max_title"
             android:textColor="@color/white"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/temperatureMaxTitle"
-
-            />
+            android:textSize="@dimen/infoText" />
 
         <TextView
             android:id="@+id/feelsLikeText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
             android:textColor="@color/white"
-            android:textSize="20sp"
-
-            app:layout_constraintBottom_toTopOf="@id/temperatureMaxText"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            android:textSize="@dimen/infoText"
             tools:text="10℃" />
 
         <TextView
             android:id="@+id/temperatureMaxText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:layout_marginEnd="8dp"
             android:textColor="@color/white"
-            android:textSize="20sp"
-
-            app:layout_constraintBottom_toTopOf="@id/temperatureMinText"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/feelsLikeText"
-
+            android:textSize="@dimen/infoText"
             tools:text="13℃" />
 
 
@@ -102,17 +82,9 @@
             android:id="@+id/temperatureMinText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
             android:textColor="@color/white"
-            android:textSize="20sp"
-
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/temperatureMaxText"
+            android:textSize="@dimen/infoText"
             tools:text="2℃" />
-
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -130,62 +102,52 @@
         app:layout_constraintTop_toTopOf="@id/tempView"
         app:layout_constraintVertical_bias="0.534">
 
-        <TextView
-            android:id="@+id/humidityTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:text="Влажность"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-
-            app:layout_constraintBottom_toTopOf="@id/pressureTitle"
+        <androidx.constraintlayout.helper.widget.Flow
+            android:id="@+id/flowAtmosphere"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_margin="8dp"
+            app:constraint_referenced_ids="humidityTitle,humidityText,pressureTitle,pressureText"
+            app:flow_horizontalStyle="spread_inside"
+            app:flow_verticalGap="6dp"
+            app:flow_maxElementsWrap="2"
+            app:flow_wrapMode="chain"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/pressureTitle"
+            android:id="@+id/humidityTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="6dp"
-            android:layout_marginBottom="8dp"
-            android:text="Давление"
+            android:text="@string/humidity_title"
             android:textColor="@color/white"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/humidityTitle" />
-
+            android:textSize="@dimen/infoText" />
 
         <TextView
             android:id="@+id/humidityText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
             android:textColor="@color/white"
-            android:textSize="20sp"
+            android:textSize="@dimen/infoText"
 
-            app:layout_constraintBottom_toTopOf="@id/pressureText"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
             tools:text="100%" />
+
+        <TextView
+            android:id="@+id/pressureTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pressure_title"
+            android:textColor="@color/white"
+            android:textSize="@dimen/infoText" />
 
         <TextView
             android:id="@+id/pressureText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
             android:textColor="@color/white"
-            android:textSize="20sp"
-
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/humidityText"
+            android:textSize="@dimen/infoText"
 
             tools:text="746мм" />
 

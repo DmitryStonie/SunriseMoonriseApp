@@ -9,6 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/compas"
+        android:contentDescription="@string/compass_content_description"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -18,7 +19,8 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="С"
+        android:text="@string/north_symbol"
+        android:textSize="@dimen/infoText"
         android:textColor="@color/white"
         app:layout_constraintTop_toTopOf="@id/compas"
         app:layout_constraintBottom_toTopOf="@id/compas"
@@ -27,7 +29,9 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Ю"
+        android:text="@string/south_symbol"
+        android:textSize="@dimen/infoText"
+
         android:textColor="@color/white"
         app:layout_constraintTop_toBottomOf="@id/compas"
         app:layout_constraintBottom_toBottomOf="@id/compas"
@@ -36,7 +40,8 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="З"
+        android:text="@string/west_symbol"
+        android:textSize="@dimen/infoText"
         android:textColor="@color/white"
         app:layout_constraintTop_toTopOf="@id/compas"
         app:layout_constraintBottom_toBottomOf="@id/compas"
@@ -45,17 +50,19 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="В"
+        android:text="@string/east_symbol"
+        android:textSize="@dimen/infoText"
         android:textColor="@color/white"
         app:layout_constraintTop_toTopOf="@id/compas"
         app:layout_constraintBottom_toBottomOf="@id/compas"
         app:layout_constraintStart_toEndOf="@id/compas"
         app:layout_constraintEnd_toEndOf=   "@id/compas"/>
     <ImageView
-        android:id="@+id/compasArrow"
+        android:id="@+id/compassArrow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/arrow_long"
+        android:contentDescription="@string/compass_arrow_content_description"
         app:layout_constraintTop_toTopOf="@id/compas"
         app:layout_constraintBottom_toBottomOf="@id/compas"
         app:layout_constraintStart_toStartOf="@id/compas"
