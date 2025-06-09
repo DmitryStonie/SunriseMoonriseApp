@@ -9,7 +9,7 @@
         android:id="@+id/api1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Приложение использует Яндекс Карты. Условия использования Яндекс Карт: https://yandex.ru/legal/maps_api/ "
+        android:text="@string/maps_api_text"
 
         android:textAlignment="center"
         android:textSize="@dimen/infoText"
@@ -22,7 +22,7 @@
         android:id="@+id/api2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Приложение работает на https://sunrisesunset.io/"
+        android:text="@string/sun_api_text"
 
         android:textAlignment="center"
         android:textSize="@dimen/infoText"
@@ -36,7 +36,7 @@
         android:id="@+id/api3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Приложение работает на https://api.farmsense.net/ "
+        android:text="@string/moon_api_text"
 
         android:textAlignment="center"
         android:textSize="@dimen/infoText"
@@ -49,7 +49,7 @@
         android:id="@+id/api4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Приложение работает на  https://openweathermap.org/api"
+        android:text="@string/weather_api_text"
 
         android:textAlignment="center"
         android:textSize="@dimen/infoText"
@@ -62,7 +62,7 @@
         android:id="@+id/api5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Приложение работает на  https://yandex.ru/maps-api/products/geocoder-api"
+        android:text="@string/geocoder_api_text"
 
         android:textAlignment="center"
         android:textSize="@dimen/infoText"
@@ -78,7 +78,7 @@
         android:layout_height="60dp"
         android:layout_marginBottom="60dp"
         style="@style/Widget.Material3.Button.ElevatedButton"
-        android:text="Назад"
+        android:text="@string/back_button_text"
         app:icon="@drawable/arrow_left"
         app:iconSize="30dp"
         app:layout_constraintStart_toStartOf="parent"

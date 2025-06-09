@@ -16,7 +16,7 @@ class DayInfoViewHolder(val view: View): BaseViewHolder(view){
     val cloudinessText: TextView = view.findViewById<TextView>(R.id.cloudinessText)
     val windSpeedText: TextView = view.findViewById<TextView>(R.id.windSpeedText)
     val windDegreeText: TextView = view.findViewById<TextView>(R.id.windDegreeText)
-    val compasArrowView: ImageView = view.findViewById<ImageView>(R.id.compasArrow)
+    val compasArrowView: ImageView = view.findViewById<ImageView>(R.id.compassArrow)
 
     fun bind(item: DayInfoItem){
         // dogshit
